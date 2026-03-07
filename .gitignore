@@ -207,8 +207,10 @@ marimo/_lsp/
 __marimo__/
 
 # Input / Output Folders
-/input
-/output
+extract_fees/input
+extract_fees/output
+/database
 
 # Misc
 .DS_Store
+.vscode/settings.json
