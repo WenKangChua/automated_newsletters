@@ -44,9 +44,11 @@ merged_df = pd.merge(
 
 merged_df = merged_df.drop(["extracted_at","matched_fee_name","fee_name_announcement","start_date"], axis=1)
 merged_df = merged_df.rename(columns={"fee_name_existing":"fee_name"})
-print(merged_df)
+column_order = ["country", "effective_date", "fee_name","current_rate", "new_rate", "fee_change"]
+merged_df = merged_df[column_order]
+# print(merged_df)
 updated_fee_markdown = merged_df.to_markdown(index=False)
-print(updated_fee_markdown)
+# print(updated_fee_markdown)
 # updated_rates_markdown = updated_rates.to_markdown(index=False)
 # fee_announcement_markdown = fee_announcement.to_markdown(index=False)
 

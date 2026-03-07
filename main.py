@@ -25,12 +25,14 @@ prompt = ChatPromptTemplate.from_messages(
     - For REVISIONS, include both the Current Rate and New Rate.
     - For INTRODUCTIONS, list the Current Rate as "N/A" or "-" and state that this is a new billing event.
     4. TONE: Maintain a professional, corporate tone suitable for an official customer notification.
+    5. Do not include these information
+    - Customer do not have access to Technical Resource Center or Pricing Guide, do not include it in.
 
     REQUIRED STRUCTURE:
     1. Headline: A clear, professional title.
     2. BODY:
-        - 1-2 paragraphs summarizing the effective date, the region, and the business purpose.
-        - A clean Markdown table with columns | Fee Name | Current Rate | New Rate |. DO NOT include fee_change column.
+        - Always start the paragtaph with effective date, the region or country, and the business purpose. Keep it to one short paragraph.
+        - A clean Markdown table with columns | Country | Effective Date | | Fee Name | Current Rate | New Rate |. DO NOT include fee_change column.
         - A brief closing mentioning that if there are any other questions, please contact us.
     """
     ),

@@ -1,5 +1,5 @@
 from vector_store import vector_store
-from chat_model import format_instruction_prompt, chat_model
+from main import format_instruction_prompt, chat_model
 import pandas as pd
 from datetime import datetime
 from pathlib import Path

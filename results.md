@@ -1,10 +1,12 @@
-# Mastercard Revises Digital Assurance Fee for Non-Tokenized Transactions
+# Mastercard Announces Revised Digital Assurance Fee for Non-Tokenized Transactions
 
-Mastercard is committed to fostering safer and more secure electronic commerce (e-commerce) transactions. As part of this commitment, effective from 6 October 2025, the company will be revising the Digital Assurance Fee (DAF) for non-tokenized transactions. This change will be reflected in the first billing cycle on 13 October 2025, impacting all issuers without tokenization enablement. The revision aims to enhance the security of e-commerce transactions and ensure a safer online shopping experience for customers.
+**Effective Date: 13 October 2025, Australia**
 
-| Fee Name                                                  | New Rate | Effective Date | Country | Current Rate |
-|:----------------------------------------------------------|---------:|:---------------|:--------|-------------:|
-| Digital Assurance Acquirer Fee – Non-Tokenized (Credit)   | 0.04     | 2025-10-13     | Australia | 0.05        |
-| Digital Assurance Acquirer Fee – Unauthenticated (Credit) | 0.04     | 2025-10-13     | Australia | N/A         |
+Mastercard is committed to enhancing the security and integrity of electronic commerce (e-commerce) transactions. In line with this commitment, we are revising the Digital Assurance Fee (DAF) for Non-Tokenized transactions. This revision aims to support safer e-commerce transactions and reflects our ongoing efforts to provide a secure and reliable payment environment for all stakeholders.
 
-If you have any questions or need further clarification regarding these changes, please do not hesitate to contact us. We are here to assist you and ensure a smooth transition to the updated fee structure.
+| Country | Effective Date | Fee Name | Current Rate | New Rate |
+|:--------|:---------------|:---------|--------------:|---------:|
+| Australia | 2025-10-13 | Digital Assurance Acquirer Fee – Non-Tokenized (Credit) | 0.05 | 0.04 |
+| Australia | 2025-10-13 | Digital Assurance Acquirer Fee – Non-Tokenized (Credit) | 0.05 | 0.04 |
+
+We appreciate your understanding and cooperation as we implement these changes. If you have any questions or require further clarification, please do not hesitate to contact us. We are here to assist you with any concerns you may have.
