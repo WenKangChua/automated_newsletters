@@ -1,0 +1,11 @@
+input:
+  input_pdf_path: "./input/fee_change_notification.pdf"
+  fee_extract_query: "Please find all relevant acquirer fees, rates, country, effective date, currency."
+  
+output:
+  output_path_fee_announcement_csv: "database/new_fees_announced/fee_announcement.csv"
+  output_notification_path: "extract_fees/output"
+
+database:
+  fee_database: "database/fee_database/fee_database.csv"
+  fee_announcement: "database/new_fees_announced/fee_announcement.csv"

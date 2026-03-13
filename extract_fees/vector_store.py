@@ -5,14 +5,13 @@ from langchain_chroma import Chroma
 
 # This file is used for embedding a pdf file, running similarity search and returning the result
 
-def vector_store(file_path:str=None, rag_query:str=None):
+# Embed and store
+embeddings = HuggingFaceEmbeddings(
+    model_name = "sentence-transformers/all-mpnet-base-v2",
+    model_kwargs = {'device': 'mps'}
+)
 
-    if file_path is None:
-        raise ValueError("Please include a valid file path")
-        exit()
-    if rag_query is None:
-        raise ValueError("Please input a valid query for similiarty search")
-        exit()
+def vector_store(file_path:str, rag_query:str, embeddings = embeddings):
 
     # Load and split
     loader = PyPDFLoader(file_path)
@@ -24,14 +23,8 @@ def vector_store(file_path:str=None, rag_query:str=None):
         )
     chunks = splitter.split_documents(docs)
 
-    # Embed and store
-    embeddings = HuggingFaceEmbeddings(
-        model = "jinaai/jina-embeddings-v5-text-small-retrieval",
-        model_kwargs = {'device': 'mps'} #set mps for macbook M chip
-    )
-
-    vectorstore = Chroma(embedding_function = embeddings, collection_name="pdf_input")
-    vectorstore = vectorstore.from_documents(chunks)
+    # vectorstore = Chroma(embedding_function = embeddings, collection_name="pdf_input")
+    vectorstore = Chroma.from_documents(chunks, embedding = embeddings)
 
     results = vectorstore.similarity_search(rag_query, k=3)
     context = "\n".join([r.page_content for r in results])
