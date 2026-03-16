@@ -2,26 +2,52 @@ from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from validation import fee_name_list
+from example_store import retrieve_examples
+from validation import fee_name, fee_name_list
+from logger import get_logger
 
-def fee_names_json_prompt_instructions():
+logger = get_logger(__name__)
 
-    # Defines json format
-    pydantic_parser = PydanticOutputParser(pydantic_object=fee_name_list)
-    # Generates the instruction
-    format_instructions = pydantic_parser.get_format_instructions()
-    format_instruction_prompt = ChatPromptTemplate.from_messages(
-        [
-        ("system", """
-        \nYour role is to extract all relevant acquirer fees to enable further processing by another agent.
-        
-        \n{format_instructions}
+def fee_names_json_prompt_instructions_with_examples(example_query:str = None):
 
+    # initalise csv headers and descriptions
+    model_fields = fee_name.model_fields
+    headers = ",".join(model_fields.keys())
+    column_description = "\n".join([f"{k}: {v.description}" for k,v in model_fields.items()])
+
+    # intialise messages
+    messages = [
+        (
+        "system", 
         """
-        ),
-        ("user", "Context:\n{context}. \n\nQuestion:\n{query}")  
-        ]
-    ).partial(format_instructions=format_instructions)
+        Analyse the context given and extract the fees information according to the rules and provide only csv output without conversation text.
+        ### Rules:
+        1)There can be more than one rows.\n
+        2)Enclose all fields in quotes.\n
+        3)Use only these csv headers - {headers}\n
+        4)Adhere to these field descriptions when extracting fees information - {column_description}
+        """
+        )
+    ]
 
+    # Retrieve example
+    examples = retrieve_examples(query = example_query)
+    for example in examples:
+        messages.append(("user", f"Example Context:\n{example['context']} \n\nExample Question: {example_query}"))
+        messages.append("assistant", example["csv_output"])
+
+    messages.append(("user", "Context:\n{context}. \n\nQuestion:\n{query}"))
+
+    # Get format instruction
+    # pydantic_parser = PydanticOutputParser(pydantic_object=fee_name_list)
+    # format_instructions = pydantic_parser.get_format_instructions()
+
+    # Generates the instruction
+    format_instruction_prompt = ChatPromptTemplate.from_messages(messages).partial(
+        headers = headers,
+        column_description = column_description
+    )
+    logger.info(format_instruction_prompt)
     return format_instruction_prompt
 
 def repair_prompt():

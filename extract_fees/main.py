@@ -1,6 +1,6 @@
 from vector_store import build_vector_store, query_vector_store
 from local_llm import mini_instruct_model
-from prompt_templates import fee_names_json_prompt_instructions, notification_article_prompt_template, repair_prompt
+from prompt_templates import *
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
@@ -8,6 +8,7 @@ import json
 from fee_lookup import fee_lookup
 from validation import validate_output, strip_markdown_fences
 from config import config
+from io import StringIO
 from logger import get_logger
 
 logger = get_logger(__name__)
@@ -29,10 +30,11 @@ logger.info(f"Query for RAG: {rag_query}")
 
 vector_store = build_vector_store(file_path = input_file_path)
 context = query_vector_store(vector_store, rag_query = rag_query)
-logger.info(f"RAG Context Output:\n {context}")
+logger.info(f"RAG Context Output:\\n {context}")
 
-prompt = fee_names_json_prompt_instructions()
-logger.info(f"Invoking Prompt: {prompt}")
+prompt = fee_names_json_prompt_instructions_with_examples(example_query = rag_query)
+logger.info(f"Invoking Prompt...")
+
 extract_fees_kwargs = {"prompt":prompt, "query":rag_query, "context":context}
 
 for attempt in range(max_retries):
@@ -52,20 +54,22 @@ for attempt in range(max_retries):
 else:
     logger.error(f"Failed to get valid output after {max_retries} attempts. Last error: {result}")
 
-response = json.loads(response)["fee_names"]
+# response = json.loads(response)["fee_names"]
 logger.info(f"Output:\n {response}")
 logger.info("Stage 1: Finish extract fee details from input")
 ### End of stage 1
 
-### Start of Stage 2
-logger.info("Stage 2: Start update fee database")
 
-output_file = base_path / config["output"]["output_path_fee_announcement_csv"]
-new_fees = pd.DataFrame(response)
+### Start of Stage 2
+logger.info("Stage 2: Finding existing fees")
+
+new_fees = pd.read_csv(StringIO(response))
+logger.info(f"Dataframe output:\n\n {new_fees}")
+# breakpoint()
 updated_fee_table_markdown = fee_lookup(new_fees)
 
 
-logger.info("Stage 2: Finish update fee database")
+logger.info("Stage 2: End finding existing fees")
 ### End of Stage 2
 
 ### Start of Stage 3

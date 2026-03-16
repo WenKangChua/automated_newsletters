@@ -11,16 +11,17 @@ class fee_name(BaseModel):
     new_rate:float | None = Field(description = "The new fee rate as express in percentage.")
     effective_date:str = Field(description = "The effective start date or end date of the fee. STRICTLY in YYYY-MM-DD format.")
     region:str | None = Field(description = "The region in which the fee is for.")
-    change_type: Literal["new_fee", "updated_fee"] = Field(description = "The type of fee change. The only values allowed are new_fee and updated_fee.")
+    currency:str = Field(description = "The currency of the fees.")
+    change_type: Literal["new_fee", "updated_fee"] = Field(description = "The only values allowed are new_fee and updated_fee.")
 
-# Enables a list of fee_name
-class fee_name_list(BaseModel):
-    fee_names: List[fee_name]
+# # Enables a list of fee_name
+# class fee_name_list(BaseModel):
+#     fee_names: List[fee_name]
 
 def validate_output(output):
     try:
-        data = fee_name_list.model_validate_json(output)
-        return True, data
+        # data = fee_name_list.model_validate_json(output)
+        return True, output
     except Exception as e:
         return False, str(e)
     

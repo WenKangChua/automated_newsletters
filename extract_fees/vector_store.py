@@ -12,6 +12,9 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 def build_vector_store(file_path, embeddings = embeddings):
+    """
+    Build a vector store using PDF as an input.
+    """
     # Load and split
     loader = PyPDFLoader(file_path)
     docs = loader.load()
@@ -22,14 +25,16 @@ def build_vector_store(file_path, embeddings = embeddings):
         )
     chunks = splitter.split_documents(docs)
 
-    # vectorstore = Chroma(embedding_function = embeddings, collection_name="pdf_input")
     vectorstore = Chroma.from_documents(chunks, embedding = embeddings)
     return vectorstore
 
 
-def query_vector_store(vectorstore, rag_query:str):
+def query_vector_store(vectorstore, rag_query:str, k:int = 3):
+    """
+    Does a similiarty search on the vectore store. Returning top K results.
+    """
 
-    results = vectorstore.similarity_search(rag_query, k = 3)
+    results = vectorstore.similarity_search(rag_query, k = k)
     context = "\n".join([r.page_content for r in results])
 
     return context

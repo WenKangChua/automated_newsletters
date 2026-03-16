@@ -8,3 +8,4 @@ output:
 database:
   fee_database: "database/fee_database/fee_database.csv"
   fee_announcement: "database/new_fees_announced/fee_announcement.csv"
+  PERSIST_DIR : "./database/chroma_db/chroma_store"
