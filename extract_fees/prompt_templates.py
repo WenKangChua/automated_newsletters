@@ -1,14 +1,13 @@
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from validation import fee_name_list
 from example_store import retrieve_examples
-from validation import fee_name, fee_name_list
+from validation import fee_name
 from logger import get_logger
 
 logger = get_logger(__name__)
 
-def fee_names_json_prompt_instructions_with_examples(example_query:str = None):
+def fee_names_prompt_instructions_with_examples(example_query:str = None):
 
     # initalise csv headers and descriptions
     model_fields = fee_name.model_fields
@@ -33,8 +32,8 @@ def fee_names_json_prompt_instructions_with_examples(example_query:str = None):
     # Retrieve example
     examples = retrieve_examples(query = example_query)
     for example in examples:
-        messages.append(("user", f"Example Context:\n{example['context']} \n\nExample Question: {example_query}"))
-        messages.append("assistant", example["csv_output"])
+        messages.append(("user", f"Example Context:\n{example["context"]} \n\nExample Question: {example_query}"))
+        messages.append(("assistant", example["csv_output"]))
 
     messages.append(("user", "Context:\n{context}. \n\nQuestion:\n{query}"))
 

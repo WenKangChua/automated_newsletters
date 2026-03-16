@@ -32,7 +32,7 @@ vector_store = build_vector_store(file_path = input_file_path)
 context = query_vector_store(vector_store, rag_query = rag_query)
 logger.info(f"RAG Context Output:\\n {context}")
 
-prompt = fee_names_json_prompt_instructions_with_examples(example_query = rag_query)
+prompt = fee_names_prompt_instructions_with_examples(example_query = rag_query)
 logger.info(f"Invoking Prompt...")
 
 extract_fees_kwargs = {"prompt":prompt, "query":rag_query, "context":context}

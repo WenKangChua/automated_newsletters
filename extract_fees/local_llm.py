@@ -5,8 +5,8 @@ from functools import lru_cache
 from langchain_core.prompts import ChatPromptTemplate
 from config import config
 
-model_id = "microsoft/Phi-4-mini-instruct"
-
+# model_id = "microsoft/Phi-4-mini-instruct"
+model_id = "mistralai/Ministral-3-3B-Instruct-2512"
 
 @lru_cache(maxsize=1)
 def _load_chat_model():
