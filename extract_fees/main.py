@@ -1,5 +1,5 @@
 from vector_store import build_vector_store, query_vector_store
-from local_llm import mini_instruct_model
+from local_llm import mini_instruct_model, _load_chat_model
 from prompt_templates import *
 import pandas as pd
 from datetime import datetime
@@ -11,6 +11,7 @@ from config import config
 from io import StringIO
 from logger import get_logger
 from system_commands import open_file
+import torch
 
 logger = get_logger(__name__)
 base_path = Path(__file__).parent.parent    
@@ -71,7 +72,7 @@ def stage_two(csv_output):
 
     new_fees = pd.read_csv(StringIO(csv_output))
     logger.info(f"Dataframe output:\n\n {new_fees}")
-    # breakpoint()
+
     updated_fee_table_markdown = fee_lookup(new_fees)
 
     logger.info("Stage 2: End finding existing fees")
@@ -89,11 +90,22 @@ def stage_three(pdf_context, updated_fee_table_markdown, csv_output):
     logger.info("Generating system notification")
     prompt = notification_article_prompt_template(context = pdf_context, updated_fee_table_markdown = updated_fee_table_markdown)
     system_notification = mini_instruct_model(prompt = prompt)
-    system_notification_csv_output = "------ CSV Ouput ------\n\n" + csv_output + "\n\n------ System Notification -----\n\n" + system_notification
-    
+    review_content = f"""Review Section, do not edit anything outside the csv block.
+
+    ```csv
+    {csv_output}
+    ```
+
+    ---
+
+    {system_notification}
+
+    """
+    review_content = ("\n".join(line.strip() for line in review_content.strip().splitlines()))
+
     logger.info(f"Saving System notification in {output_file_name}")
     with open(output_file_path, "w", encoding="utf-8") as f:
-        f.write(system_notification_csv_output)
+        f.write(review_content)
 
     logger.info(f"Completed generating system notification: {output_file_name}")
     return output_file_path
@@ -116,7 +128,12 @@ def stage_four(output_file_path):
 if __name__ == "__main__":
     logger.info(f"Start of process")
     csv_output, pdf_context = stage_one()
+    
     updated_fee_table_markdown = stage_two(csv_output)
-    output_file_name = stage_three(pdf_context, updated_fee_table_markdown)
+    
+    output_file_name = stage_three(pdf_context, updated_fee_table_markdown, csv_output)
+    _load_chat_model.cache_clear()
+    torch.mps.empty_cache()
+    
     stage_four(output_file_name)
     logger.info(f"End of process")
