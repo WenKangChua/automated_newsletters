@@ -27,7 +27,7 @@ def validate_output(output):
     
 def strip_markdown_fences(text: str) -> str:
     text = text.strip()
-    text = re.sub(r"^```(?:json)?\s*", "", text)
+    text = re.sub(r"^```(?:csv)?\s*", "", text)
     text = re.sub(r"\s*```$", "", text)
     return text.strip()
 

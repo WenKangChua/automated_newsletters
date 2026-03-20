@@ -31,10 +31,10 @@ def fee_names_prompt_instructions_with_examples(example_query:str = None):
     ]
 
     # Retrieve example
-    # examples = retrieve_examples(query = example_query)
-    # for example in examples:
-    #     messages.append(("user", f"Example Context:\n{example["context"]} \n\nExample Question: {example_query}"))
-    #     messages.append(("assistant", example["csv_output"]))
+    examples = retrieve_examples(query = example_query)
+    for example in examples:
+        messages.append(("user", f"Example Context:\n{example["context"]} \n\nExample Question: {example_query}"))
+        messages.append(("assistant", example["csv_output"]))
 
     messages.append(("user", "Context:\n{context}. \n\nQuestion:\n{query}"))
 

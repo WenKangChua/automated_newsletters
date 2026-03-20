@@ -4,7 +4,6 @@ from langchain_core.documents import Document
 from pathlib import Path
 from datetime import datetime
 from vector_store import embeddings
-
 from vector_store import *
 from config import config
 from langchain_community.document_loaders import PyPDFLoader
@@ -50,31 +49,36 @@ if __name__ == "__main__":
     input_file_path = config["input"]["input_pdf_path"]
     
     data = get_example_store()
-    data.reset_collection()
-
-    loader = PyPDFLoader(input_file_path)
-    docs = loader.load()
-    
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
-        strip_whitespace=True
-    )
-
-    rag_query = "Please find all relevant acquirer fees, rates, country, effective date, currency."
-    sample_output = """
-    "fee_name","new_rate","effective_date","region","currency","change_type"
-    "Digital Assurance Acquirer Fee – Non-Tokenized (Debit)","0.04","2025-10-13","Australia","AUD","updated_fee"
-    "Digital Assurance Acquirer Fee – Non-Tokenized (Credit)","0.04","2025-10-13","Australia","AUD","updated_fee"
-    """
-    chunks = splitter.split_documents(docs)
-    temp_vector_store = Chroma.from_documents(chunks, embedding = embeddings)
-    temp_document = temp_vector_store.similarity_search(rag_query, k = 3)
-    context = "\n".join([r.page_content for r in temp_document]) # from a list of documents, join page_content into a single list
-    add_example(context, sample_output)
-
+    # data.reset_collection()
     print(data.get())
-    print(data._collection.name)
+
+    
+    # data = get_example_store()
+ 
+
+    # loader = PyPDFLoader(input_file_path)
+    # docs = loader.load()
+    
+    # splitter = RecursiveCharacterTextSplitter(
+    #     chunk_size=500,
+    #     chunk_overlap=50,
+    #     strip_whitespace=True
+    # )
+
+    # rag_query = "Please find all relevant acquirer fees, rates, country, effective date, currency."
+    # sample_output = """
+    # "fee_name","new_rate","effective_date","region","currency","change_type"
+    # "Digital Assurance Acquirer Fee – Non-Tokenized (Debit)","0.04","2025-10-13","Australia","AUD","updated_fee"
+    # "Digital Assurance Acquirer Fee – Non-Tokenized (Credit)","0.04","2025-10-13","Australia","AUD","updated_fee"
+    # """
+    # chunks = splitter.split_documents(docs)
+    # temp_vector_store = Chroma.from_documents(chunks, embedding = embeddings)
+    # temp_document = temp_vector_store.similarity_search(rag_query, k = 3)
+    # context = "\n".join([r.page_content for r in temp_document]) # from a list of documents, join page_content into a single list
+    # add_example(context, sample_output)
+
+    # print(data.get())
+    # print(data._collection.name)
 
     
     

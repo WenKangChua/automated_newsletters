@@ -3,8 +3,8 @@ import sys
 
 def open_file(filepath):
     if sys.platform == "darwin":       # macOS
-        subprocess.run(["open", filepath])
+        subprocess.Popen(["open", "-a", "TextEdit", filepath])
     elif sys.platform == "win32":      # Windows
-        subprocess.run(["start", filepath], shell=True)
+        subprocess.Popen(["notepad.exe", filepath])
     elif sys.platform.startswith("linux"):  # Linux
-        subprocess.run(["xdg-open", filepath])
+        subprocess.Popen(["xdg-open", filepath])

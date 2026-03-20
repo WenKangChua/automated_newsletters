@@ -12,9 +12,10 @@ from io import StringIO
 from logger import get_logger
 from system_commands import open_file
 import torch
+import re
 
 logger = get_logger(__name__)
-base_path = Path(__file__).parent.parent    
+base_path = Path(__file__).parent.parent # ~/Documents/GitHub/customer_notification_generator/
 datetime_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def stage_one():
@@ -103,37 +104,45 @@ def stage_three(pdf_context, updated_fee_table_markdown, csv_output):
     """
     review_content = ("\n".join(line.strip() for line in review_content.strip().splitlines()))
 
-    logger.info(f"Saving System notification in {output_file_name}")
-    with open(output_file_path, "w", encoding="utf-8") as f:
-        f.write(review_content)
+    logger.info(f"Saving System notification in {output_file_path}")
+    output_file_path.write_text(review_content, encoding="utf-8")
+    # with open(output_file_path, "w", encoding="utf-8") as f:
+        # f.write(review_content)
 
     logger.info(f"Completed generating system notification: {output_file_name}")
-    return output_file_path
+    return output_file_path, output_file_name, review_content
     ### End of Stage 3
 
-def stage_four(output_file_path):
+def stage_four(output_file_path, output_file_name,pdf_context, review_content):
     ## Start of Stage 4
     ### To add the csv and notification into example_store
+    open_file(output_file_path)
     while True:
-        logger.info(f"Please review and edit the notification before continuing.")
-        open_file(output_file_path)
-        save = input("Save csv output to vectore store? It may be used as an example in the future. (Y/N)").strip().lower()
+        logger.info("Please review and edit the notification before continuing.")
+        save = input("Save csv output to vector store? It may be used as an example in the future. (Y/N) ").strip().lower()
         if save == "y":
-            add_example(context = pdf_context, csv_output = csv_output)
+            output_file = output_file_path.read_text()
+            # csv_output = re.search(r"```csv(.*?)```", output_file, re.DOTALL).group(1).strip()
+            output_file_path.rename(base_path / "database/system_notifications" /  output_file_name)
+            # add_example(context = pdf_context, csv_output = csv_output)
             logger.info(f"{output_file_path} have been added to example store")
-        else:
             break
+        elif save == "n":
+            logger.info("Quiting...")
+            break
+        else:
+            logger.info("Please enter either Y or N ")
     ### End of stage 4
 
 if __name__ == "__main__":
-    logger.info(f"Start of process")
+    logger.info("Start of process")
     csv_output, pdf_context = stage_one()
     
     updated_fee_table_markdown = stage_two(csv_output)
     
-    output_file_name = stage_three(pdf_context, updated_fee_table_markdown, csv_output)
+    output_file_path, output_file_name, review_content = stage_three(pdf_context, updated_fee_table_markdown, csv_output)
     _load_chat_model.cache_clear()
     torch.mps.empty_cache()
     
-    stage_four(output_file_name)
-    logger.info(f"End of process")
+    stage_four(output_file_path, output_file_name, pdf_context, review_content)
+    logger.info("End of process")
