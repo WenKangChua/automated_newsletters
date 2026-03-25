@@ -1,9 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import List
 from typing import Literal
 import re
-from langchain_core.output_parsers import PydanticOutputParser
-
+import pandas as pd
+from io import StringIO
 
 # Using pydantic BaseModel, define a list of fields and dtype
 class fee_name(BaseModel):
@@ -14,18 +13,24 @@ class fee_name(BaseModel):
     currency:str = Field(description = "The currency of the fees.")
     change_type: Literal["new_fee", "updated_fee", "deleted_fee"] = Field(description = "The only values allowed are new_fee and updated_fee.")
 
-# # Enables a list of fee_name
-# class fee_name_list(BaseModel):
-#     fee_names: List[fee_name]
-
-def validate_output(output):
+def validate_output(output:str, pydantic_base_model:BaseModel) -> tuple[bool, str]:
+    """
+    validates the model output against a pydantic base model class.
+    It test for dataframe conversion and validates value against a pydantic base model.
+    If there is an error, return False and the error message else, it will return true.
+    """
     try:
-        # data = fee_name_list.model_validate_json(output)
+        df_output = pd.read_csv(StringIO(output))
+        for i, row in df_output.iterrows():
+            pydantic_base_model(**row.to_dict())
         return True, output
     except Exception as e:
         return False, str(e)
     
-def strip_markdown_fences(text: str) -> str:
+def strip_markdown_fences(text:str) -> str:
+    """
+    Returns a string with backticks striped.
+    """
     text = text.strip()
     text = re.sub(r"^```(?:csv)?\s*", "", text)
     text = re.sub(r"\s*```$", "", text)

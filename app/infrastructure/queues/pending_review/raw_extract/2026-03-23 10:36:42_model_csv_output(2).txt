@@ -1,0 +1,39 @@
+```context
+Questions
+Customers with questions about the information in this announcement should contact Global Customer Service
+using the contact information on the Technical Resource Center.
+© 2025 Mastercard. Proprietary. All rights reserved.
+15 April 2025 • AP 11539.1 Revised Pricing for the Digital Assurance Fee for Non-
+Tokenized Transactions in Australia2
+Related information
+Information relevant to this announcement is available on the Technical Resource Center (TRC) on Mastercard
+Connect™. Mastercard updates manuals with necessary changes after release implementation. Depending on
+timing, information provided in this announcement will be available when Mastercard updates the manual.
+• AN 1850 Mastercard Announces a Digital Assurance Fee in the Asia/Pacific Region
+Questions
+15 April 2025 Initial publication date
+Billing and pricing information
+Mastercard will revise the fees in the Billing and pricing table effective 6
+October 2025 and will bill the fees weekly with the first billing occurring
+on 13 October 2025.
+Acquirer Fees
+Weekly Card-on-File (COF) transactions
+Billing event
+number Billing event name
+Service
+ID
+Rate
+(%)
+2AB3505 Digital Assurance Acquirer Fee –
+Non-Tokenized (Debit)
+AA 0.04
+2AB3506 Digital Assurance Acquirer Fee –
+Non-Tokenized (Credit)
+AA 0.04
+```
+-------
+```csv
+"fee_name","new_rate","effective_date","region","currency","change_type"
+"Digital Assurance Acquirer Fee – Non-Tokenized (Debit)","0.04","2025-10-13","Australia","USD","updated_fee"
+"Digital Assurance Acquirer Fee – Non-Tokenized (Credit)","0.04","2025-10-13","Australia","USD","updated_fee"
+```

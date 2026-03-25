@@ -1,21 +1,26 @@
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from example_store import retrieve_examples
-from validation import fee_name
-from logger import get_logger
+from retrieval.example_store import retrieve_examples
+from domain.llm.llm_validation import fee_name
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def fee_names_prompt_instructions_with_examples(example_query:str = None):
+def raw_fee_extract_prompt_template(example_query:str = None) -> ChatPromptTemplate:
+    """
+    Returns a prompt with instructions to extract the fees from a pdf.
+    It includes headers and column description from a pydantic model.
+    There is also an option to add in examples to improve model consistency.
+    """
 
-    # initalise csv headers and descriptions
-    model_fields = fee_name.model_fields
-    headers = ",".join(model_fields.keys())
-    column_description = "\n".join([f"{k}: {v.description}" for k,v in model_fields.items()])
+    # initalise csv headers and descriptions from pydantic base model
+    model_fields:dict[str, any] = fee_name.model_fields
+    headers:str = ",".join(model_fields.keys())
+    column_description:str = "\n".join([f"{k}: {v.description}" for k,v in model_fields.items()])
 
     # intialise messages
-    messages = [
+    messages:list[str] = [
         (
         "system", 
         """
@@ -30,47 +35,42 @@ def fee_names_prompt_instructions_with_examples(example_query:str = None):
         )
     ]
 
-    # Retrieve example
-    examples = retrieve_examples(query = example_query)
+    # Retrieve example and append to message
+    examples:list[dict] = retrieve_examples(query = example_query)
     for example in examples:
         messages.append(("user", f"Example Context:\n{example["context"]} \n\nExample Question: {example_query}"))
         messages.append(("assistant", example["csv_output"]))
 
     messages.append(("user", "Context:\n{context}. \n\nQuestion:\n{query}"))
 
-    # Get format instruction
-    # pydantic_parser = PydanticOutputParser(pydantic_object=fee_name_list)
-    # format_instructions = pydantic_parser.get_format_instructions()
-
     # Generates the instruction
-    format_instruction_prompt = ChatPromptTemplate.from_messages(messages).partial(
+    prompt:ChatPromptTemplate = ChatPromptTemplate.from_messages(messages).partial(
         headers = headers,
         column_description = column_description
     )
-    logger.info("\n" + str(format_instruction_prompt))
-    return format_instruction_prompt
 
-def repair_prompt():
-    prompt = ChatPromptTemplate.from_messages(
+    logger.info("\n" + str(prompt))
+    return prompt
+
+def repair_prompt_template() -> ChatPromptTemplate:
+    """
+    Returns a prompt containing the previous output and python error to fix any invalid output.
+    """
+    prompt:ChatPromptTemplate = ChatPromptTemplate.from_messages(
         [
-            ("system", """
-             You are a system that fixes invalid csv outputs.
-             """
-             ),
-            (
-            "user","""
-            Previous Output:
-            {previous_output}
-
-            Error:
-            {error}
-            """)
+            ("system", "Please read the previous output and the error message. Fix the error."),
+            ("user", "Context:\n{context}\n\nQuestion:\n{query}"),
+            ("assistant","{previous_output}")
+            ("user","Please fix this error:\n{error}")
         ]
     )
     return prompt
 
-def notification_article_prompt_template(updated_fee_table_markdown:str, context:str):
-    prompt = ChatPromptTemplate.from_messages(
+def notification_article_prompt_template(updated_fee_table_markdown:str, context:str) -> ChatPromptTemplate:
+    """
+    Returns a prompt with a set of instruction to generate the article style fee announcement.
+    """
+    prompt:ChatPromptTemplate = ChatPromptTemplate.from_messages(
         [
         ("system", 
         """
@@ -104,6 +104,6 @@ def notification_article_prompt_template(updated_fee_table_markdown:str, context
         """
         )  
         ]
-    ).partial(context = context, updated_fee_table_markdown=updated_fee_table_markdown )
+    ).partial(context = context, updated_fee_table_markdown = updated_fee_table_markdown)
 
     return prompt

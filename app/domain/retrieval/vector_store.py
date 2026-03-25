@@ -2,7 +2,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -10,12 +10,11 @@ logger = get_logger(__name__)
 
 # Embed and store
 embeddings = HuggingFaceEmbeddings(
-    # model_name = "sentence-transformers/all-mpnet-base-v2",
     model_name = "BAAI/bge-m3",
     model_kwargs={'device': 'mps'}
 )
 
-def build_vector_store(file_path, embeddings = embeddings):
+def build_vector_store(file_path, embeddings = embeddings) -> Chroma:
     """
     Build a vector store using PDF as an input.
     """
@@ -23,23 +22,19 @@ def build_vector_store(file_path, embeddings = embeddings):
     loader = PyPDFLoader(file_path)
     docs = loader.load()
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
-        strip_whitespace=True
+        chunk_size = 500,
+        chunk_overlap = 50,
+        strip_whitespace = True
         )
     chunks = splitter.split_documents(docs)
-
-    vectorstore = Chroma.from_documents(chunks, embedding = embeddings)
-    return vectorstore
+    return Chroma.from_documents(chunks, embedding = embeddings)
 
 
-def query_vector_store(vectorstore, rag_query:str, k:int = 3):
+def query_vector_store(vectorstore, rag_query:str, k:int = 3) -> str:
     """
     Does a similiarty search on the vectore store. Returning top K results.
     """
-
     results = vectorstore.similarity_search(rag_query, k = k)
     context = "\n".join([r.page_content for r in results])
-    logger.info("\nRAG Context:\n" + str([r.page_content for r in results]))
-
+    logger.info("\nRAG Context:\n" + str(context))
     return context

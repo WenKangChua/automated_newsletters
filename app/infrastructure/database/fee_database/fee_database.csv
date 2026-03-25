@@ -1,0 +1,6 @@
+fee_name,current_rate,start_date,region,is_deprecated
+Non-Tokenized Digital Assurance Fee (Debit),0.02,2022-03-07,Australia,True
+Non-Tokenized Digital Assurance Fee (Credit),0.02,2022-03-07,Australia,True
+Non-Tokenized Digital Assurance Fee (Debit),0.03,2024-03-07,Australia,False
+Non-Tokenized Digital Assurance Fee (Credit),0.03,2024-03-07,Australia,False
+Non-Tokenized Digital Assurance Fee (Debit),0.05,2024-03-07,Singapore,False

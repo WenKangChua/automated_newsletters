@@ -1,7 +1,13 @@
 import subprocess
 import sys
 
-def open_file(filepath):
+def open_file(filepath) -> None:
+    """
+    Open the file in the OS default text editor.\n
+    MacOS - TextEdit\n
+    Windows - Notepad\n
+    Linux - xdg
+    """
     if sys.platform == "darwin":       # macOS
         subprocess.Popen(["open", "-a", "TextEdit", filepath])
     elif sys.platform == "win32":      # Windows
