@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from retrieval.example_store import retrieve_examples
-from domain.llm.llm_validation import fee_name
-from utils.logger import get_logger
+from app.domain.retrieval.example_store import retrieve_examples
+from app.domain.llm.llm_validation import fee_name
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

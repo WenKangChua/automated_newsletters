@@ -1,8 +1,8 @@
 import pandas as pd
 from rapidfuzz import process, fuzz
 from pathlib import Path
-from utils.config import config
-from utils.logger import get_logger
+from app.utils.config import config
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 base_path = Path(__file__).parent.parent

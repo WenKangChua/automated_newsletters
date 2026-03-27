@@ -1,43 +1,42 @@
-from customer_notification_generator.app.domain.retrieval.vector_store import build_vector_store, query_vector_store
-from domain.llm.local_llm import run_mini_instruct_model, _load_chat_model
-from domain.llm.prompt_templates import *
-import pandas as pd
-from datetime import datetime
 from pathlib import Path
-from domain.retrieval.example_store import add_example
-from domain.fees.match_fee import fee_lookup
-from domain.llm.llm_validation import validate_output, strip_markdown_fences
-from utils.config import config
+from app.domain.retrieval.vector_store import build_vector_store, query_vector_store
+from app.domain.llm.local_llm import run_mini_instruct_model, _load_chat_model
+from app.domain.llm.prompt_templates import *
+from app.domain.retrieval.example_store import add_example
+from app.domain.fees.match_fee import fee_lookup
+from app.domain.llm.llm_validation import validate_output, strip_markdown_fences
+from app.utils.config import config, base_path, datetime_now
 from io import StringIO
-from utils.logger import get_logger
-from utils.system_commands import open_file
+from app.utils.logger import get_logger
+from app.utils.system_commands import open_file
+import pandas as pd
 
 logger = get_logger(__name__)
-base_path = Path(__file__).parent.parent # ~/Documents/GitHub/customer_notification_generator/
-datetime_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-output_file_name:str = datetime_now + "_model_csv_output.txt"
-output_folder_path = base_path / config["output"]["output_notification_path"]
-output_md_path:Path = output_folder_path / output_file_name
+
+
 
 def stage_1():
     """
     From PDF files in a input folder, a model will extract all relevant acquirer fees and return
     the results in a text file into the output folder.
     """
+    raw_extract_filepath:Path = base_path / config["output"]["raw_extract_path"] # Folder where raw extract are to be reviewed
+    input_file:Path = base_path / config["input"]["pdf_input_path"] / "Sample test file.pdf" # Folder where pdf file to be processed
+
     ## Start of stage 1
     # initialise file paths and variables
     logger.info("Stage 1: Start extract fee details from input")
-    input_file_path = config["input"]["input_pdf_path"]
+    
     rag_query ="Please find all relevant acquirer fees, rates, country, effective date, currency."
     max_retries = 3
 
     # From my PDF, get relevant context through similiarity search
     # Format instruction prompt with system user tag to ensure json output
     # Pass the prompt and context into phi4 chat model from huggingface
-    logger.info(f"Reading file from: {input_file_path}")
+    logger.info(f"Reading file from: {input_file}")
     logger.info(f"Query for RAG: {rag_query}")
 
-    vector_store = build_vector_store(file_path = input_file_path)
+    vector_store = build_vector_store(file = input_file)
     pdf_context = query_vector_store(vector_store, rag_query = rag_query)
 
     raw_fee_extract_prompt = raw_fee_extract_prompt_template(example_query = rag_query)
@@ -48,7 +47,7 @@ def stage_1():
     for attempt in range(max_retries):
         csv_output = run_mini_instruct_model(**extract_fees_kwargs)
         csv_output = strip_markdown_fences(csv_output)
-        valid, result = validate_output(csv_output)
+        valid, result = validate_output(output = csv_output, pydantic_base_model = fee_name)
         if valid:
             logger.info(f"Valid output on attempt {attempt + 1}")
             break
@@ -63,17 +62,21 @@ def stage_1():
         logger.error(f"Failed to get valid output after {max_retries} attempts. Last error: {result}")
 
     model_csv_output = f"""
+    Contains the context used to generate the extract.
     ```context
     {pdf_context}
     ```
     -------
+    The extract that was generated based on the context above.
     ```csv
     {csv_output}
     ```
     """
     model_csv_output = ("\n".join(line.strip() for line in model_csv_output.strip().splitlines()))
-    
-    output_md_path.write_text(model_csv_output, encoding = "utf-8")
+
+    # Write raw extract to review queue
+    raw_extract_filepath = raw_extract_filepath / f"{datetime_now} + _model_csv_output.txt"
+    raw_extract_filepath.write_text(model_csv_output, encoding = "utf-8")
 
     logger.info(f"Output:\n {csv_output}")
     logger.info("Stage 1: Finish extract fee details from input")

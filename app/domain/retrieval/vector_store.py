@@ -2,7 +2,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from utils.logger import get_logger
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -14,12 +14,12 @@ embeddings = HuggingFaceEmbeddings(
     model_kwargs={'device': 'mps'}
 )
 
-def build_vector_store(file_path, embeddings = embeddings) -> Chroma:
+def build_vector_store(file:str, embeddings = embeddings) -> Chroma:
     """
     Build a vector store using PDF as an input.
     """
     # Load and split
-    loader = PyPDFLoader(file_path)
+    loader = PyPDFLoader(file)
     docs = loader.load()
     splitter = RecursiveCharacterTextSplitter(
         chunk_size = 500,

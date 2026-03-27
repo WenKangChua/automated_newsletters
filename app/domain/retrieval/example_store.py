@@ -2,10 +2,10 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from pathlib import Path
 from datetime import datetime
-from vector_store import embeddings
-from utils.config import config
+from app.domain.retrieval.vector_store import embeddings
+from app.utils.config import config
 import re
-from utils.logger import get_logger
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 base_path:Path = Path(__file__).parent.parent
