@@ -1,11 +1,10 @@
 import pandas as pd
 from rapidfuzz import process, fuzz
 from pathlib import Path
-from app.utils.config import config
-from app.utils.logger import get_logger
+from utils.config import config, base_path
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
-base_path = Path(__file__).parent.parent
 
 def get_fuzzy_match(fee_name:str, choices:list[str], threshold:int = 85) -> str|None:
     """
@@ -17,37 +16,37 @@ def get_fuzzy_match(fee_name:str, choices:list[str], threshold:int = 85) -> str|
         return match[0]
     return None
 
-def fee_lookup(raw_extract:pd.DataFrame) -> str:
+def fee_lookup(database_file_path:Path, raw_extract:pd.DataFrame) -> str:
     """
     Takes a dataframe of new fees and fuzzy matches them against the internal fee database.
     Returns a markdown-formatted table with matched fee names, old rates(if applicable), new rates, and change types.
     """
-    fee_database_csv:Path = base_path / config["database"]["fee_database_csv"]
+    fee_database_csv:Path = database_file_path
     
     logger.info(f"Reading Fee Database: '{fee_database_csv}'")
     fee_database:pd.DataFrame = pd.read_csv(fee_database_csv)
     fee_database = fee_database[fee_database["is_deprecated"] == False]
 
-    # We map 'old' fee names to the closest 'new' fee names
-    choices:list[str] = fee_database["fee_name"].tolist()
-    raw_extract["matched_fee_name"] = raw_extract["fee_name"].apply(
-        lambda x: get_fuzzy_match(x, choices)
-    )
-    logger.info(f"Database fuzz match result:\n{raw_extract}")
+    # # We map 'old' fee names to the closest 'new' fee names
+    # choices:list[str] = fee_database["fee_name"].tolist()
+    # raw_extract["matched_fee_name"] = raw_extract["fee_name"].apply(
+    #     lambda x: get_fuzzy_match(x, choices)
+    # )
+    # logger.info(f"Database fuzz match result:\n{raw_extract}")
 
     #Merge the tables
     matched_fees:pd.DataFrame = pd.merge(
         raw_extract, 
         fee_database,
-        left_on=["matched_fee_name","region"], 
-        right_on=["fee_name","region"], 
+        left_on=["billing_id","service_id"], 
+        right_on=["billing_id","service_id"], 
         how="left",
         suffixes=("_database", "_extract")
     )
 
     logger.info(f"Dropping Columns... Renaming Columns.... Ordering Column...")
     matched_fees = matched_fees.rename(columns={"fee_name_database":"fee_name"})
-    column_order:list[str] = ["region", "effective_date", "fee_name","current_rate", "new_rate", "change_type"]
+    column_order:list[str] = ["country", "effective_date", "fee_name","current_rate", "new_rate", "change_type"]
     matched_fees = matched_fees[column_order]
 
     matched_fees = matched_fees.to_markdown(index=False)

@@ -1,14 +1,17 @@
 input:
-  pdf_input_path: "infrastructure/queues/file_input"
-  add_example_path: 'infrastructure/database/example_store/examples'
+  pdf_input_dir: "infrastructure/queues/file_input"
+  add_example_dir: 'infrastructure/database/example_store/examples'
+
+review:
+  raw_extract_dir: "infrastructure/queues/pending_review/raw_extract"
+  newsletter_dir: "infrastructure/queues/pending_review/newsletter"
 
 output:
-  raw_extract_path: "infrastructure/queues/pending_review/raw_extract"
-  completed_path: "infrastructure/queues/completed"
+  newsletter_dir: "infrastructure/queues/completed/newsletter"
 
 database:
   fee_database_csv: "infrastructure/database/fee_database/fee_database.csv"
-  example_store_path : "infrastructure/database/example_store"
+  example_store_dir : "infrastructure/database/example_store"
 
 model_id:
   phi4: "microsoft/Phi-4-mini-instruct"

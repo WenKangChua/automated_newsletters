@@ -3,7 +3,7 @@ import torch
 from transformers import pipeline
 from functools import lru_cache
 from langchain_core.prompts import ChatPromptTemplate
-from app.utils.config import config
+from utils.config import config
 
 model_id = config["model_id"]["phi4"]
 

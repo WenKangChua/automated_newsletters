@@ -2,16 +2,14 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from pathlib import Path
 from datetime import datetime
-from app.domain.retrieval.vector_store import embeddings
-from app.utils.config import config
+from domain.retrieval.vector_store import embeddings
+from utils.config import config, base_path, datetime_now
 import re
-from app.utils.logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
-base_path:Path = Path(__file__).parent.parent
-datetime_now:str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-example_store_path:Path = base_path / config["database"]["example_store_path"]
-add_example_path:Path = base_path / config["input"]["add_example_path"]
+_example_store_dir:Path = base_path / config["database"]["example_store_dir"]
+_add_example_path:Path = base_path / config["input"]["add_example_dir"]
 
 def get_example_store() -> Chroma:
     """
@@ -19,7 +17,7 @@ def get_example_store() -> Chroma:
     Collection name = "few_shot_examples_pdf_input"
     """
     return Chroma(
-        persist_directory = example_store_path,
+        persist_directory = _example_store_dir,
         embedding_function = embeddings,
         collection_name = "few_shot_examples_pdf_input"
     )
@@ -32,13 +30,12 @@ def add_example() -> None:
     The csv is the response from the SLM as defined in a pydantic class - fee_name.
     """
     vectorstore:Chroma = get_example_store()
-    raw_extract_path:list[Path] = [f for f in add_example_path.iterdir() if f.is_file() and f.suffix in {".txt", ".csv", ".md"}]
-    for each in raw_extract_path:
-        raw_extract:str = each.read_text(encoding = 'utf-8')
-        
+    raw_extract_file:list[Path] = [f for f in _add_example_path.iterdir() if f.is_file() and f.suffix in {".txt", ".csv", ".md"}]
+
+    for each in raw_extract_file:
+        raw_extract:str = each.read_text(encoding = 'utf-8')        
         raw_extract_csv:str = re.search(r"```csv(.*?)```", raw_extract, re.DOTALL).group(1).strip()
-        raw_extract_context = re.search(r"```context(.*?)```", raw_extract, re.DOTALL).group(1).strip()
-        
+        raw_extract_context = re.search(r"```context(.*?)```", raw_extract, re.DOTALL).group(1).strip()       
         doc = Document(
             page_content = raw_extract_context,
             metadata = {
