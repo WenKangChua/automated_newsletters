@@ -6,9 +6,11 @@ An automated pipeline that processes carrier General Rate Increase (GRI) bulleti
 
 ## 🏢 About SwiftFreight
 
-SwiftFreight is a last-mile logistics operator specialising in cross-border e-commerce delivery. We work with online merchants looking to ship goods internationally — consolidating shipments from multiple clients and partnering with international freight carriers for the cross-border transit leg. Upon arrival at the destination country, SwiftFreight manages the final delivery directly to the end consumer.
+SwiftFreight is a last-mile logistics operator specialising in cross-border e-commerce delivery of small to medium packages for consumers. 
 
-As a consolidator and last-mile operator, we absorb and pass through carrier-imposed surcharges — such as fuel surcharges and General Rate Increases (GRIs) — to our merchant clients. When carriers adjust their rates, we are committed to communicating these changes clearly and promptly, so merchants can plan accordingly.
+We work with online merchants looking to ship goods internationally, consolidating shipments and partnering with international freight carriers for the cross-border transit. Upon arrival at the destination country, SwiftFreight manages the final delivery directly to the end consumer.
+
+As a consolidator and last-mile operator, we pass through carrier-imposed surcharges, such as fuel surcharges and General Rate Increases (GRIs) — to our merchant clients. When carriers adjust their rates, we are committed to communicating these changes clearly and promptly, so merchants can plan accordingly.
 
 ---
 
