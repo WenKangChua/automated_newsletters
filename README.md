@@ -4,12 +4,28 @@ An automated pipeline that processes carrier General Rate Increase (GRI) bulleti
 
 ---
 
+## 🏢 About SwiftFreight
+
+SwiftFreight is a last-mile logistics operator specialising in cross-border e-commerce delivery. We work with online merchants looking to ship goods internationally — consolidating shipments from multiple clients and partnering with international freight carriers for the cross-border transit leg. Upon arrival at the destination country, SwiftFreight manages the final delivery directly to the end consumer.
+
+As a consolidator and last-mile operator, we absorb and pass through carrier-imposed surcharges — such as fuel surcharges and General Rate Increases (GRIs) — to our merchant clients. When carriers adjust their rates, we are committed to communicating these changes clearly and promptly, so merchants can plan accordingly.
+
+---
+
 ## 📌 Business Problem
 
-Freight carriers periodically publish GRI bulletins announcing rate changes. As a logistics operator, we summarise these bulletins into newsletters for our clients. This is a manual, time-consuming process with two key challenges:
+Freight carriers periodically publish GRI bulletins announcing rate changes across their full rate card. As a last-mile consolidator, SwiftFreight only owns a specific leg of the delivery journey — the destination last-mile — and only passes through surcharges that fall within that scope. This means a significant portion of any bulletin is irrelevant to our merchants.
 
-1. **Relevance filtering** — Bulletins contain rate changes across lanes, services, or client segments that may not apply to all clients, and must be excluded accordingly.
-2. **Rate enrichment** — Bulletins only state the *new* rate. The *current* rate must be looked up from an internal rate database for the notification to be meaningful to clients.
+Charges that do **not** apply to SwiftFreight merchants include:
+
+- **Origin charges** — export documentation, origin port handling, and cargo inspections at the shipper's end; these are costs borne at the origin country, before SwiftFreight's involvement
+- **Customs duties & import taxes** — levied on the end consumer or importer, not on SwiftFreight as the delivery operator
+- **Specialised cargo surcharges** — hazardous materials handling, refrigerated/cold chain, or bulk cargo fees that fall outside SwiftFreight's standard parcel service
+
+Summarising these bulletins into merchant newsletters is currently a manual, time-consuming process with two key challenges:
+
+1. **Relevance filtering** — Bulletins must be read carefully to identify only the surcharges that apply to SwiftFreight's last-mile parcel service and are passed through to merchants.
+2. **Rate enrichment** — Bulletins only state the *new* rate. The *current* rate must be looked up from an internal rate database for the notification to be meaningful to merchants.
 
 This pipeline automates the full workflow: extract → enrich → generate → review → publish.
 
@@ -191,9 +207,3 @@ automated_newsletters/
 | `rapidfuzz` | Fuzzy string matching for rate name lookup |
 | `pypdf` | PDF loading |
 | `PyYAML` | Config management |
-
----
-
-## 📝 License
-
-This project is for internal/personal use. See `LICENSE` for details.
