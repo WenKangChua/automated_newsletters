@@ -214,3 +214,13 @@ extract_fees/output
 # Misc
 .DS_Store
 .vscode/settings.json
+
+# Vector Store
+.sqlite3
+
+# HNSW index binary files (inside UUID-named segment subdirectories)
+**/store/**/data_level0.bin
+**/store/**/header.bin
+**/store/**/length.bin
+**/store/**/link_lists.bin
+"
