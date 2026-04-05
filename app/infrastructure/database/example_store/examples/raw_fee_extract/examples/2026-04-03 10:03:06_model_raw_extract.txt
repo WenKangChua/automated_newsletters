@@ -1,0 +1,112 @@
+Bulletin
+```bulletin
+mock_gri_bulletin_2_example_store.pdf
+```
+---
+Contains the context used to generate the extract
+```context
+GRI-2025-SG-001 General Rate Increase for Parcel Delivery
+Services in Singapore
+Type:
+Bulletin Announcement
+Published:
+1 March 2025
+Category:
+Pricing / Fees
+Effective:
+1 June 2025
+Audience:
+Shipper / Merchant / Processor
+First Billing:
+9 June 2025
+Region:
+Asia / Pacific
+Brand:
+SwiftFreight
+Country:
+Singapore
+Action:
+Financial
+Executive Overview
+SwiftFreight is revising surcharge rates across its full parcel delivery service portfolio in Singapore, effective 1 June
+2025. This General Rate Increase (GRI) covers destination delivery charges, origin handling charges, and specialised
+cargo surcharges, reflecting rising operational, fuel, and compliance costs across the delivery network.
+Effective Date Details
+Date
+Details
+1 June 2025
+Revised pricing becomes effective
+9 June 2025
+First billing date under new rates
+What SwiftFreight is Doing
+SwiftFreight is revising surcharge rates across three charge categories: destination charges applied at the point of
+delivery, origin charges applied at the point of dispatch, and specialised cargo surcharges for shipments requiring
+additional handling. All revised rates apply to weekly billing cycles commencing 9 June 2025. Refer to the Billing and
+Pricing Information section below for the full rate tables.
+Version History
+Date
+Description of Change
+1 March 2025
+Initial publication date
+Billing and Pricing Information
+SwiftFreight will revise the fees in the Billing and Pricing tables below effective 1 June 2025, with the first billing
+occurring on 9 June 2025. All rates are expressed as a percentage of the shipment value unless otherwise stated.
+Section 1: Destination Charges
+Destination charges apply at the point of delivery in Singapore. These surcharges cover last-mile delivery costs
+including fuel and remote area access, and are passed through to merchants and shippers.
+Weekly Destination Surcharges
+Billing Event No.
+Billing Event Name
+Service ID
+New Rate (%)
+GRI-SG-001
+Standard Ground Delivery Surcharge
+SG-GND
+2.75
+GRI-SG-002
+Remote Area Delivery Surcharge
+SG-REM
+3.10
+Section 2: Origin Charges
+Origin charges apply at the point of dispatch and cover export documentation and origin port handling. These charges
+are borne at the origin country prior to SwiftFreight's involvement in the delivery journey.
+Weekly Origin Surcharges
+Billing Event No.
+Billing Event Name
+Service ID
+New Rate (%)
+GRI-SG-010
+Origin Port Handling Fee
+SG-OPH
+1.20
+GRI-SG-011
+Export Documentation Fee
+SG-EXP
+0.65
+Section 3: Specialised Cargo Surcharges
+Specialised cargo surcharges apply to shipments requiring additional handling outside of SwiftFreight's standard
+parcel service. This includes hazardous materials and refrigerated cold-chain cargo. These surcharges are applied at
+the carrier's discretion and are subject to cargo classification at the time of booking.
+Weekly Specialised Cargo Surcharges
+Billing Event No.
+Billing Event Name
+Service ID
+New Rate (%)
+GRI-SG-020
+Hazardous Materials Handling Surcharge
+SG-HAZ
+4.50
+GRI-SG-021
+Refrigerated Cold-Chain Surcharge
+SG-COLD
+5.50
+© 2025 SwiftFreight Logistics Pte. Ltd. Proprietary. All rights reserved.
+GRI-2025-SG-001 General Rate Increase for Parcel Delivery Services in Singapore  1 March 2025
+```
+---
+The extract that was generated based on the context above
+```csv
+"billing_id","service_id","fee_name","new_rate","effective_date","country","currency","change_type","charge_category"
+"GRI-SG-001","SG-GND","Standard Ground Delivery Surcharge","2.75","2025-06-01","Singapore","SGD","updated_fee","destination"
+"GRI-SG-002","SG-REM","Remote Area Delivery Surcharge","3.10","2025-06-01","Singapore","SGD","updated_fee","destination"
+```

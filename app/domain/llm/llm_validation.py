@@ -14,6 +14,7 @@ class fee_name(BaseModel):
     country:str | None = Field(description = "The country applicable")
     currency:str = Field(description = "The currency of the fees")
     change_type: Literal["new_fee", "updated_fee", "deleted_fee"] = Field(description = "Contains either new_fee, updated_fee or deleted_fee")
+    charge_category: Literal["destination", "origin", "specialised_cargo"] = Field(description = "The category of charges the fee is in")
     model_config = ConfigDict(extra='forbid')
 
 def validate_output(output:str, pydantic_base_model:BaseModel) -> tuple[bool, str]:

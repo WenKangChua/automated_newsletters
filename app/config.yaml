@@ -1,17 +1,24 @@
-input:
-  pdf_input_dir: "infrastructure/queues/file_input"
-  add_example_dir: 'infrastructure/database/example_store/examples'
+queues:
+  input:
+    pending_process_dir: "infrastructure/queues/pending_process"
 
-review:
-  raw_extract_dir: "infrastructure/queues/pending_review/raw_extract"
-  newsletter_dir: "infrastructure/queues/pending_review/newsletter"
+  review:
+    raw_extract_dir: "infrastructure/queues/pending_review/raw_extract"
+    newsletter_dir: "infrastructure/queues/pending_review/newsletter"
 
-output:
-  newsletter_dir: "infrastructure/queues/completed/newsletter"
+  output:
+    newsletter_dir: "infrastructure/queues/completed/newsletter"
+    raw_extract_dir: "infrastructure/queues/completed/raw_extract"
 
 database:
-  fee_database_csv: "infrastructure/database/fee_database/fee_database.csv"
-  example_store_dir : "infrastructure/database/example_store"
+  csv:
+    fee_database_csv: "infrastructure/database/fee_database/fee_database.csv"
+  store:
+    raw_extract_example_store_dir : "infrastructure/database/example_store/examples/raw_fee_extract/store"
+    add_example_raw_extract_dir: "infrastructure/database/example_store/examples/raw_fee_extract/examples"
+
+    newsletter_example_store_dir : "infrastructure/database/example_store/examples/newsletter/store"
+    add_example_newsletter_dir: "infrastructure/database/example_store/examples/newsletter/examples"
 
 model_id:
   phi4: "microsoft/Phi-4-mini-instruct"

@@ -8,102 +8,103 @@ import re
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
-_example_store_dir:Path = base_path / config["database"]["example_store_dir"]
-_add_example_path:Path = base_path / config["input"]["add_example_dir"]
 
-def get_example_store() -> Chroma:
+_raw_extract_example_store_dir:Path = base_path / config["database"]["store"]["raw_extract_example_store_dir"] # contains raw extract examples
+_raw_extract_add_example_path:Path = base_path / config["database"]["store"]["add_example_raw_extract_dir"] # dir to add new raw extract examples in
+
+_newsletter_example_store_dir:Path = base_path / config["database"]["store"]["newsletter_example_store_dir"] # contains newsletter examples
+_newsletter_add_example_path:Path = base_path / config["database"]["store"]["add_example_newsletter_dir"] # dir to add new newsletter examples in
+
+def _get_raw_extract_example_store() -> Chroma:
     """
-    Return ChromaDB example store used to feed in examples into the model for more consistent responses.
-    Collection name = "few_shot_examples_pdf_input"
+    Return ChromaDB raw extract example store used to feed in examples into the model for more consistent responses.
     """
     return Chroma(
-        persist_directory = _example_store_dir,
+        persist_directory = _raw_extract_example_store_dir,
         embedding_function = embeddings,
-        collection_name = "few_shot_examples_pdf_input"
+        collection_name = "few_shot_examples_raw_extract"
     )
 
-def add_example() -> None:
+def _get_newsletter_example_store() -> Chroma:
     """
-    To add example(s) from text files in database/example_store/add_example.
-    The file must contain a context and a csv code block.
-    The context is the result from a vector store similarty search.
-    The csv is the response from the SLM as defined in a pydantic class - fee_name.
+    Return ChromaDB newsletter example store used to feed in examples into the model for more consistent responses.
     """
-    vectorstore:Chroma = get_example_store()
-    raw_extract_file:list[Path] = [f for f in _add_example_path.iterdir() if f.is_file() and f.suffix in {".txt", ".csv", ".md"}]
+    return Chroma(
+        persist_directory = _newsletter_example_store_dir,
+        embedding_function = embeddings,
+        collection_name = "few_shot_examples_newsletter"
+    )
+
+def add_raw_extract_example() -> None:
+    """
+    To add raw extract examples to raw extract example store. The file must contain a context and a csv code block.
+    """
+    vectorstore:Chroma = _get_raw_extract_example_store()
+    raw_extract_file:list[Path] = [f for f in _raw_extract_add_example_path.iterdir() if f.is_file() and f.suffix in {".txt", ".csv", ".md"}]
 
     for each in raw_extract_file:
         raw_extract:str = each.read_text(encoding = 'utf-8')        
         raw_extract_csv:str = re.search(r"```csv(.*?)```", raw_extract, re.DOTALL).group(1).strip()
-        raw_extract_context = re.search(r"```context(.*?)```", raw_extract, re.DOTALL).group(1).strip()       
+        raw_extract_context = re.search(r"```context(.*?)```", raw_extract, re.DOTALL).group(1).strip()
+        file_name = re.search(r"```bulletin(.*?)```", raw_extract, re.DOTALL).group(1).strip()
         doc = Document(
-            page_content = raw_extract_context,
+            page_content = raw_extract_context, #input example
             metadata = {
                 "created_datetime": datetime_now,
-                "csv_output": raw_extract_csv
+                "csv_output": raw_extract_csv, #output example
+                "file_name": file_name
                 }
         )
         vectorstore.add_documents([doc])
 
-def retrieve_examples(query: str, k: int = 1) -> list[dict]:
+def retrieve_raw_extract_examples(query:str, k:int = 1) -> list[dict]:
     """
-    Retrieve examples from the example_store. Using query for similarity search.
-    Primarily used in prompt template to enable more concise responses.
+    Retrieve raw extract examples from example store.
     """
-    vectorstore:Chroma = get_example_store()
+    vectorstore:Chroma = _get_raw_extract_example_store()
     results:list[Document] = vectorstore.similarity_search(query, k = k)
     return [
         {
             "context": r.page_content,
-            "csv_output": r.metadata["csv_output"]
+            "csv_output": r.metadata["csv_output"],
+            "file_name": r.metadata["file_name"]
         }
         for r in results
     ]
 
-if __name__ == "__main__":
+def add_newsletter_example() -> None:
     """
-    One time to reset or build input/output examples for fee json extraction.
-    """ 
-    # input_file_path = config["input"]["input_pdf_path"]
-    
-    data = get_example_store()
-    data.reset_collection()
-    add_example()
-    # print(data.get())
-    
-    # data = get_example_store()
+    To add raw extract examples to raw extract example store. The file must contain a context and a csv code block.
+    """
+    vectorstore:Chroma = _get_newsletter_example_store()
+    raw_extract_file:list[Path] = [f for f in _newsletter_add_example_path.iterdir() if f.is_file() and f.suffix in {".txt", ".csv", ".md"}]
 
-    # loader = PyPDFLoader(input_file_path)
-    # docs = loader.load()
-    
-    # splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size=500,
-    #     chunk_overlap=50,
-    #     strip_whitespace=True
-    # )
+    for each in raw_extract_file:
+        raw_extract:str = each.read_text(encoding = 'utf-8')
+        fee_markdown_table:str = re.search(r"```markdown_table(.*?)```", raw_extract, re.DOTALL).group(1).strip()
+        newsletter_context = re.search(r"```newsletter(.*?)```", raw_extract, re.DOTALL).group(1).strip()
+        file_name = re.search(r"```file_name(.*?)```", raw_extract, re.DOTALL).group(1).strip()  
+        doc = Document(
+            page_content = fee_markdown_table, #input example
+            metadata = {
+                "created_datetime": datetime_now, 
+                "newsletter_output": newsletter_context, #output example
+                "file_name": file_name
+                }
+        )
+        vectorstore.add_documents([doc])
 
-    rag_query = "Please find all relevant acquirer fees, rates, country, effective date, currency."
-    result = retrieve_examples(rag_query, k = 2)
-    logger.info(f"Results:\n {result}")
-
-    # sample_output = """
-    # "fee_name","new_rate","effective_date","region","currency","change_type"
-    # "Digital Assurance Acquirer Fee – Non-Tokenized (Debit)","0.04","2025-10-13","Australia","AUD","updated_fee"
-    # "Digital Assurance Acquirer Fee – Non-Tokenized (Credit)","0.04","2025-10-13","Australia","AUD","updated_fee"
-    # """
-    # chunks = splitter.split_documents(docs)
-    # temp_vector_store = Chroma.from_documents(chunks, embedding = embeddings)
-    # temp_document = temp_vector_store.similarity_search(rag_query, k = 3)
-    # context = "\n".join([r.page_content for r in temp_document]) # from a list of documents, join page_content into a single list
-    # add_example(context, sample_output)
-
-    # print(data.get())
-    # print(data._collection.name)
-
-    
-    
-
-
-
-
-    
+def retrieve_newsletter_examples(query: str, k: int = 1) -> list[dict]:
+    """
+    Retrieve newsletter examples from example store.
+    """
+    vectorstore:Chroma = _get_newsletter_example_store()
+    results:list[Document] = vectorstore.similarity_search(query, k = k)
+    return [
+        {
+            "markdown_table": r.page_content,
+            "newsletter_output": r.metadata["newsletter_output"],
+            "file_name": r.metadata["file_name"]
+        }
+        for r in results
+    ]

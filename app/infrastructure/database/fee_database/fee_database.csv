@@ -1,10 +1,11 @@
-billing_id,service_id,fee_name,current_rate,start_date,region,is_deprecated
-GRI-SG-001,SG-GND,Ground Delivery Surcharge,2.5,2025-01-07,Singapore,True
-GRI-SG-002,SG-AIR,Express Air Delivery Surcharge,3.10,2025-01-07,Singapore,True
-GRI-SG-003,SG-RES,Residence Address Surcharge,1.30,2025-01-07,Singapore,True
-GRI-SG-001,SG-GND,Ground Delivery Surcharge,2.60,2025-01-07,Singapore,False
-GRI-SG-002,SG-AIR,Express Air Delivery Surcharge,3.20,2025-01-07,Singapore,False
-GRI-SG-003,SG-RES,Residence Address Surcharge,1.40,2025-01-07,Singapore,False
-GRI-SG-001,MY-GND,Ground Delivery Surcharge,2.00,2025-01-07,Malaysia,False
-GRI-SG-002,MY-AIR,Express Air Delivery Surcharge,3.00,2025-01-07,Malaysia,False
-GRI-SG-003,MY-RES,Residence Address Surcharge,1.40,2025-01-07,Malaysia,False
+billing_id,service_id,fee_name,currency,current_rate,start_date,region,charge_category,is_deprecated
+GRI-SG-001,SG-GND,SG Ground Delivery Surcharge,SGD,2.5,2025-01-07,Singapore,destination,True
+GRI-SG-002,SG-AIR,SG Express Air Delivery Surcharge,SGD,3.10,2025-01-07,Singapore,destination,True
+GRI-SG-002,SG-REM,SG Remote Area Delivery Surcharge,SGD,3.00,2025-01-07,Singapore,destination,False
+GRI-SG-003,SG-RES,SG Residence Address Surcharge,SGD,1.30,2025-01-07,Singapore,destination,True
+GRI-SG-001,SG-GND,SG Ground Delivery Surcharge,SGD,2.60,2025-01-07,Singapore,destination,False
+GRI-SG-003,SG-RES,SG Residence Address Surcharge,SGD,1.40,2025-01-07,Singapore,destination,False
+GRI-SG-001,MY-GND,MY Ground Delivery Surcharge,MYR,2.00,2025-01-07,Malaysia,destination,False
+GRI-SG-002,MY-AIR,MY Express Air Delivery Surcharge,MYR,3.00,2025-01-07,Malaysia,destination,False
+GRI-SG-003,MY-RES,MY Residence Address Surcharge,MYR,1.40,2025-01-07,Malaysia,destination,False
+GRI-SG-003,SG-RES,SG Residential Address Surcharge,SGD,1.40,2025-01-07,Singapore,destination,False
