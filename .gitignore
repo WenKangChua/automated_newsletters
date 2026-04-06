@@ -215,14 +215,11 @@ extract_fees/output
 .DS_Store
 .vscode/settings.json
 
-# Vector Store
-.sqlite3
-
 # HNSW index binary files (inside UUID-named segment subdirectories)
 **/store/**/data_level0.bin
 **/store/**/header.bin
 **/store/**/length.bin
 **/store/**/link_lists.bin
-"
 app/infrastructure/database/example_store/examples/newsletter/store/chroma.sqlite3
 app/infrastructure/database/example_store/examples/raw_fee_extract/store/chroma.sqlite3
+*.sqlite3
