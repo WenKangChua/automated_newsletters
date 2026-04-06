@@ -1,32 +1,30 @@
 # 📬 Automated Newsletters
 
-An automated pipeline that processes carrier General Rate Increase (GRI) bulletins (e.g. SwiftFreight), enriches rate data with current rates from an internal database, and generates client-ready notification articles — reducing manual effort and ensuring only relevant rate information reaches clients.
+An automated pipeline that processes carrier General Rate Increase (GRI) bulletins, enriches rate data with current rates from an internal database, and generates client-ready notification articles — reducing manual effort and ensuring only relevant destination charges reach merchants.
 
 ---
 
-## 🏢 About SwiftFreight
+## 🏢 About SwiftParcel
 
-SwiftFreight is a last-mile logistics operator specialising in cross-border e-commerce delivery of small to medium packages for consumers. 
+SwiftParcel is a last-mile delivery operator specialising in cross-border e-commerce. Merchants ship their goods internationally via a freight forwarder — once the shipment arrives at the destination country, SwiftParcel takes over, handling the final delivery directly to the end consumer.
 
-We work with online merchants looking to ship goods internationally, consolidating shipments and partnering with international freight carriers for the cross-border transit. Upon arrival at the destination country, SwiftFreight manages the final delivery directly to the end consumer.
-
-As a consolidator and last-mile operator, we pass through carrier-imposed surcharges, such as fuel surcharges and General Rate Increases (GRIs) — to our merchant clients. When carriers adjust their rates, we are committed to communicating these changes clearly and promptly, so merchants can plan accordingly.
+As a destination-side operator, SwiftParcel incurs and passes through **destination charges** — such as fuel surcharges, remote area delivery fees, and peak season surcharges — to its merchant clients. When carriers revise these rates via a GRI bulletin, SwiftParcel is committed to communicating the changes clearly and promptly so merchants can plan accordingly.
 
 ---
 
 ## 📌 Business Problem
 
-Freight carriers periodically publish GRI bulletins announcing rate changes across their full rate card. As a last-mile consolidator, SwiftFreight only owns a specific leg of the delivery journey — the destination last-mile — and only passes through surcharges that fall within that scope. This means a significant portion of any bulletin is irrelevant to our merchants.
+Freight carriers periodically publish GRI bulletins announcing rate changes across their full rate card. As a destination-side last-mile operator, SwiftParcel is only responsible for **destination charges**. A significant portion of any bulletin is therefore irrelevant to our merchants:
 
-Charges that do **not** apply to SwiftFreight merchants include:
-
-- **Origin charges** — export documentation, origin port handling, and cargo inspections at the shipper's end; these are costs borne at the origin country, before SwiftFreight's involvement
-- **Customs duties & import taxes** — levied on the end consumer or importer, not on SwiftFreight as the delivery operator
-- **Specialised cargo surcharges** — hazardous materials handling, refrigerated/cold chain, or bulk cargo fees that fall outside SwiftFreight's standard parcel service
+| Category | Examples | Passed to merchants? |
+|---|---|---|
+| **Destination charges** | Fuel surcharge, remote area delivery, peak season, residential address surcharge | ✅ Yes — SwiftParcel's core service costs |
+| **Origin charges** | Export documentation, origin port handling, cargo inspections | ❌ No — incurred at the origin country before SwiftParcel's involvement |
+| **Specialised cargo charges** | Hazmat handling, cold chain, bulk cargo fees | ❌ No — outside SwiftParcel's standard parcel service |
 
 Summarising these bulletins into merchant newsletters is currently a manual, time-consuming process with two key challenges:
 
-1. **Relevance filtering** — Bulletins must be read carefully to identify only the surcharges that apply to SwiftFreight's last-mile parcel service and are passed through to merchants.
+1. **Relevance filtering** — Bulletins must be read carefully to identify only the destination charges that fall within SwiftParcel's service scope.
 2. **Rate enrichment** — Bulletins only state the *new* rate. The *current* rate must be looked up from an internal rate database for the notification to be meaningful to merchants.
 
 This pipeline automates the full workflow: extract → enrich → generate → review → publish.
@@ -40,12 +38,12 @@ This pipeline automates the full workflow: extract → enrich → generate → r
 ```mermaid
 flowchart TD
     A[Receive carrier GRI bulletin PDF] --> B[Manually read bulletin]
-    B --> C{Relevant to our clients?}
+    B --> C{Destination charge\nrelevant to merchants?}
     C -- No --> D[Discard / Ignore]
     C -- Yes --> E[Manually look up current rate\nin internal systems]
     E --> F[Draft newsletter article]
     F --> G[Internal review & edits]
-    G --> H[Send to clients]
+    G --> H[Send to merchants]
 ```
 
 ### To-Be (Automated Pipeline)
@@ -70,18 +68,18 @@ flowchart TD
     end
 
     subgraph Stage 2 - Enrich
-        I --> K[Fuzzy match rate names\nagainst rate database]
-        K --> L[Merge current rates\nfrom internal database]
+        I --> K[Match billing ID & service ID\nagainst rate database]
+        K --> L[Filter to destination charges only\nMerge current rates]
     end
 
     subgraph Stage 3 - Generate
-        L --> M[LLM generates article-style\nclient notification]
+        L --> M[LLM generates article-style\nmerchant notification]
     end
 
     subgraph Stage 4 - Review & Store
         M --> N[Operator reviews & edits notification]
         N -- Approved --> O[Save to example store\nfor future few-shot use]
-        N -- Approved --> P[Publish notification to clients]
+        N -- Approved --> P[Publish notification to merchants]
     end
 ```
 
@@ -115,16 +113,22 @@ pip install -r requirements.txt
 All paths and model settings are managed in `app/config.yaml`. Key entries:
 
 ```yaml
-input:
-  pdf_input_path: "app/infrastructure/queues/file_input"
-
-output:
-  raw_extract_path: "app/infrastructure/queues/pending_review/raw_extract"
-  notifications_path: "app/infrastructure/queues/notifications"
+queues:
+  input:
+    pending_process_dir: "infrastructure/queues/pending_process"
+  review:
+    raw_extract_dir: "infrastructure/queues/pending_review/raw_extract"
+    newsletter_dir: "infrastructure/queues/pending_review/newsletter"
+  output:
+    newsletter_dir: "infrastructure/queues/completed/newsletter"
+    raw_extract_dir: "infrastructure/queues/completed/raw_extract"
 
 database:
-  fee_database_csv: "app/infrastructure/database/fee_database/fee_database.csv"
-  example_store_path: "app/infrastructure/database/example_store"
+  csv:
+    fee_database_csv: "infrastructure/database/fee_database/fee_database.csv"
+  store:
+    raw_extract_example_store_dir: "infrastructure/database/example_store/examples/raw_fee_extract/store"
+    newsletter_example_store_dir: "infrastructure/database/example_store/examples/newsletter/store"
 
 model_id:
   phi4: "microsoft/Phi-4-mini-instruct"
@@ -132,15 +136,33 @@ model_id:
 
 ### Running the Pipeline
 
+The pipeline is operated via an interactive CLI:
+
 ```bash
 # From project root
 python app/entrypoints/main.py
 ```
 
+```
+========================================
+  Automated Newsletters - Pipeline CLI
+========================================
+  1. Run full pipeline
+  2. Stage 1   — Extract fees from PDF
+  3. Stage 1.1 — Review raw extract
+  4. Stage 2+3 — Generate newsletter
+  5. Stage 4   — Review newsletter
+  6. Save approved examples to store
+  0. Exit
+========================================
+```
+
+Stages can be run individually (e.g. to re-run generation after editing a raw extract) or as a full end-to-end pipeline via option 1.
+
 To initialise or reset the few-shot example store:
 
 ```bash
-python app/domain/retrieval/example_store.py
+python app/entrypoints/view_store.py
 ```
 
 ---
@@ -151,30 +173,36 @@ python app/domain/retrieval/example_store.py
 automated_newsletters/
 ├── app/
 │   ├── entrypoints/
-│   │   └── main.py                   # Pipeline entry point
+│   │   ├── main.py                   # Interactive CLI entry point
+│   │   ├── view_store.py             # Initialise / reset few-shot example store
+│   │   └── markdown_table.py         # Dev utility: preview fee markdown table
 │   ├── pipeline/
-│   │   └── pipeline.py               # Orchestration logic
+│   │   ├── pipeline.py               # Orchestration logic — wires all stages together
+│   │   ├── extraction.py             # Stage 1: PDF extraction & validation
+│   │   ├── generate.py               # Stage 3: Newsletter generation
+│   │   └── review.py                 # Stage 1.1 & 4: Human review & example saving
 │   ├── domain/
 │   │   ├── fees/
-│   │   │   └── match_fee.py          # Rate lookup & fuzzy matching
+│   │   │   └── match_fee.py          # Stage 2: Rate lookup & destination charge filtering
 │   │   ├── llm/
-│   │   │   ├── local_llm.py          # LLM loader (cached)
-│   │   │   ├── prompt_templates.py   # Prompt construction
-│   │   │   └── llm_validation.py     # Pydantic output validation
+│   │   │   ├── local_llm.py          # LLM loader (LRU-cached)
+│   │   │   ├── prompt_templates.py   # Prompt construction (extraction & newsletter)
+│   │   │   └── llm_validation.py     # Pydantic schema & output validation
 │   │   └── retrieval/
 │   │       ├── vector_store.py       # PDF embedding & RAG
 │   │       └── example_store.py      # Few-shot example management
 │   ├── infrastructure/
 │   │   ├── database/
-│   │   │   ├── fee_database/         # Internal rate database CSV
-│   │   │   └── example_store/        # ChromaDB few-shot store
+│   │   │   ├── fee_database/         # Internal destination rate database (CSV)
+│   │   │   └── example_store/        # ChromaDB few-shot stores
 │   │   └── queues/
-│   │       ├── file_input/           # Drop PDFs here
-│   │       ├── pending_review/       # Awaiting operator review
-│   │       └── notifications/        # Generated articles
+│   │       ├── pending_process/      # Drop PDFs here to begin pipeline
+│   │       ├── pending_review/       # Awaiting operator review (raw extract & newsletter)
+│   │       └── completed/            # Approved outputs
 │   └── utils/
-│       ├── config.py                 # YAML config loader
-│       └── logger.py                 # Logging setup
+│       ├── config.py                 # YAML config loader & base path
+│       ├── logger.py                 # Logging setup
+│       └── system_commands.py        # OS file-open helper
 ├── app/config.yaml
 └── requirements.txt
 ```
@@ -190,7 +218,8 @@ automated_newsletters/
 | **CSV output format** | Smaller instruction-following models perform more reliably with flat CSV output than structured JSON; Pydantic acts as the schema contract independently |
 | **Pydantic validation** | Validates every field of the LLM's output (types, date format, allowed literals, rate ranges) against a schema; structured errors are fed back into a repair prompt loop |
 | **Repair prompt loop** | If validation fails, the previous output and error are passed back to the LLM with instructions to self-correct, up to 3 attempts |
-| **Fuzzy matching (rapidfuzz)** | Rate names in bulletins often differ slightly from internal database names; `token_sort_ratio` matching bridges this gap without requiring exact string equality |
+| **Billing ID & service ID matching** | Destination charges are matched against the internal rate database using exact `billing_id` + `service_id` keys, ensuring precise rate enrichment |
+| **Destination charge filtering** | `match_fee.py` filters the rate database to active destination charges only before merging, so origin and specialised cargo charges are never surfaced to merchants |
 | **Human-in-the-loop** | Two review gates — after raw extraction and after article generation — ensure operator oversight before any output is published or saved as a training example |
 | **LRU-cached LLM loading** | The model is loaded once and cached via `@lru_cache`; explicit cache clearing + `gc.collect()` + `torch.mps.empty_cache()` releases memory after use |
 
@@ -209,3 +238,9 @@ automated_newsletters/
 | `rapidfuzz` | Fuzzy string matching for rate name lookup |
 | `pypdf` | PDF loading |
 | `PyYAML` | Config management |
+
+---
+
+## 📝 Purpose
+
+This project is for internal/personal use.

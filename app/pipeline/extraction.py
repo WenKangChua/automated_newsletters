@@ -39,7 +39,7 @@ def raw_fee_extract(input_file:Path, _output_file_name:str) -> tuple[str]:
                 logger.info("Repairing prompt...")
                 raw_fee_extract_prompt = repair_prompt_template(context = pdf_context, query = rag_query, previous_output = raw_extract, error = result)
     else:
-        logger.error(f"Failed to get valid output after {max_retries} attempts. Last error: {result}")
+        logger.exception("Unexpected failure during extraction")
 
     # Building SLM raw_extract report
     model_raw_extract = f"""

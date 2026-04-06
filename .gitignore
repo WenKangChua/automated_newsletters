@@ -206,20 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Input / Output Folders
-extract_fees/input
-extract_fees/output
-/database
-
 # Misc
 .DS_Store
 .vscode/settings.json
-
-# HNSW index binary files (inside UUID-named segment subdirectories)
-**/store/**/data_level0.bin
-**/store/**/header.bin
-**/store/**/length.bin
-**/store/**/link_lists.bin
-app/infrastructure/database/example_store/examples/newsletter/store/chroma.sqlite3
-app/infrastructure/database/example_store/examples/raw_fee_extract/store/chroma.sqlite3
-*.sqlite3

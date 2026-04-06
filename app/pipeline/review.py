@@ -2,6 +2,7 @@ from pathlib import Path
 from utils.config import config, base_path
 from utils.logger import get_logger
 from utils.system_commands import open_file
+import shutil
 
 logger = get_logger(__name__)
 
@@ -54,11 +55,11 @@ def save_raw_extract_example():
     source_files:list[Path] = [f for f in raw_extract_complete_dir.iterdir() if f.is_file() and f.suffix in {".txt",".md",".csv"}]
     if source_files:
         output_file_names:str = "\n".join(f.name for f in source_files)
-        logger.warning(f"Moving raw extracts into example store:\n\t\t\t{output_file_names}")
+        logger.warning(f"Copying raw extracts into example store:\n\t\t\t{output_file_names}")
     
         for each in source_files:
-            each.rename(raw_extract_add_example_dir / each.name)
-            logger.info(f"Moved {each.name} from '{Path(*raw_extract_complete_dir.parts[-3:])}' -> '{Path(*raw_extract_add_example_dir.parts[-4:])}'")
+            shutil.copy2(raw_extract_complete_dir / each.name, raw_extract_add_example_dir / each.name)
+            logger.info(f"Copied {each.name} from '{Path(*raw_extract_complete_dir.parts[-3:])}' -> '{Path(*raw_extract_add_example_dir.parts[-4:])}'")
     else:
         logger.info(f"No files to moved in {Path(*raw_extract_complete_dir.parts[-3:])}")
     return None
@@ -73,8 +74,8 @@ def save_newsletter_example():
         logger.warning(f"Copying newsletter into example store:\n{output_file_names}")
     
         for each in source_files:
-            each.rename(newsletter_add_example_dir / each.name)
-            logger.info(f"Moved {each.name} from '{Path(*newsletter_complete_dir.parts[-3:])}' -> '{Path(*newsletter_add_example_dir.parts[-4:])}'")
+            shutil.copy2(newsletter_complete_dir / each.name, newsletter_add_example_dir / each.name)
+            logger.info(f"Copied {each.name} from '{Path(*newsletter_complete_dir.parts[-3:])}' -> '{Path(*newsletter_add_example_dir.parts[-4:])}'")
     else:
         logger.info(f"No files to moved in {Path(*newsletter_complete_dir.parts[-3:])}")
     return None

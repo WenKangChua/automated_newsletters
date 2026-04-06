@@ -34,11 +34,14 @@ def validate_output(output:str, pydantic_base_model:BaseModel) -> tuple[bool, st
     for i, row in df_output.iterrows():
         try:
             pydantic_base_model(**row.to_dict())
-            return True, output
         except ValidationError as e:
             for error in e.errors():
                 error_message.append(f"Row {i} | Field: {error['loc']} | Error Message: {error['msg']} | Wrong Value: {error['input']}")
-    return False, ("\n".join(error_message))
+
+    if not error_message:
+        return True, output
+    else:
+        return False, ("\n".join(error_message))
 
 def strip_markdown_fences(text:str) -> str:
     """
@@ -48,12 +51,3 @@ def strip_markdown_fences(text:str) -> str:
     text = re.sub(r"^```(?:csv)?\s*", "", text)
     text = re.sub(r"\s*```$", "", text)
     return text.strip()
-
-if __name__ == "__main__":
-    _csv = """
-"fee_name","new_rate","effective_date","country","currency","change_type"
-"Standard Ground Delivery Surcharge","2.75","2025-06-01","Singapore","SGD","updated_fee"
-"Express Air Delivery Surcharge","3.30","2025-06-01","Singapore","SGD","updated_fee"
-"Residential Address Surcharge","1.50","2025-06-01","Singapore","SGD","updated_fee"
-"""
-    validate_output(_csv, fee_name)
