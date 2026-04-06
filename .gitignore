@@ -224,3 +224,5 @@ extract_fees/output
 **/store/**/length.bin
 **/store/**/link_lists.bin
 "
+app/infrastructure/database/example_store/examples/newsletter/store/chroma.sqlite3
+app/infrastructure/database/example_store/examples/raw_fee_extract/store/chroma.sqlite3
