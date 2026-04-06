@@ -54,7 +54,7 @@ def save_raw_extract_example():
     source_files:list[Path] = [f for f in raw_extract_complete_dir.iterdir() if f.is_file() and f.suffix in {".txt",".md",".csv"}]
     if source_files:
         output_file_names:str = "\n".join(f.name for f in source_files)
-        logger.warning(f"Moving raw extracts into example store:\n{output_file_names}")
+        logger.warning(f"Moving raw extracts into example store:\n\t\t\t{output_file_names}")
     
         for each in source_files:
             each.rename(raw_extract_add_example_dir / each.name)
@@ -70,7 +70,7 @@ def save_newsletter_example():
     source_files:list[Path] = [f for f in newsletter_complete_dir.iterdir() if f.is_file() and f.suffix in {".txt",".md",".csv"}]
     if source_files:
         output_file_names:str = "\n".join(f.name for f in source_files)
-        logger.warning(f"Moving newsletter into example store:\n{output_file_names}")
+        logger.warning(f"Copying newsletter into example store:\n{output_file_names}")
     
         for each in source_files:
             each.rename(newsletter_add_example_dir / each.name)
