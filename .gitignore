@@ -209,3 +209,4 @@ __marimo__/
 # Misc
 .DS_Store
 .vscode/settings.json
+*.sqlite3
