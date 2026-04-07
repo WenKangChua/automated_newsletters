@@ -210,3 +210,5 @@ __marimo__/
 .DS_Store
 .vscode/settings.json
 *.sqlite3
+app/infrastructure/database/example_store/examples/newsletter/store/
+app/infrastructure/database/example_store/examples/raw_fee_extract/store
