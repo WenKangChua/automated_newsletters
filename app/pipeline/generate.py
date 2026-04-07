@@ -27,7 +27,7 @@ def generate_fee_markdown_table(file_name:str) -> str:
 
     return updated_fee_table_markdown
 
-def generate_newsletter(input_file_name:str, fee_table_markdown:str, output_file_name:str) -> None:
+def generate_newsletter(fee_table_markdown:str, output_file_name:str) -> None:
 
     output_file_name = output_file_name + "_results.md"
     complete_queue_dir = base_path / config["queues"]["review"]["newsletter_dir"] / output_file_name
@@ -38,7 +38,7 @@ def generate_newsletter(input_file_name:str, fee_table_markdown:str, output_file
     review_content = f"""
     Bulletin:\n
     ```file_name
-    {input_file_name}
+    {output_file_name}
     ```
     ---
     Markdown Table:\n

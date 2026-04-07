@@ -35,7 +35,7 @@ ACTIONS = {
     "3": ("Review raw extract",        run_review_raw_extract),
     "4": ("Generate newsletter",       run_generate),
     "5": ("Review newsletter",         run_review_newsletter),
-    "6": ("Save examples to store",   run_save_examples),
+    "6": ("Save examples to store",    run_save_examples),
 }
 
 def main():

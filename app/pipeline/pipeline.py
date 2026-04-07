@@ -7,19 +7,21 @@ from utils.config import base_path, config, datetime_now
 
 logger = get_logger(__name__)
 
-_input_file_name:str = "mock_gri_bulletin_1.pdf"
-_output_file_name:str = "output_mock_gri_bulletin_1"
-_input_file_dir:Path = base_path / config["queues"]["input"]["pending_process_dir"] / _input_file_name # Folder where pdf file to be processed    
-
 def run_extraction():
-    raw_fee_extract(_input_file_dir, _output_file_name)
+    input_file_dir:Path = base_path / config["queues"]["input"]["pending_process_dir"]
+    pending_process_files:list[Path] = [f for f in input_file_dir.iterdir() if f.is_file() and f.suffix in {".pdf"}]
+    for each in pending_process_files:
+        raw_fee_extract(each)
 
 def run_review_raw_extract():
     review_raw_extract()
 
 def run_generate():
-    fee_table_markdown = generate_fee_markdown_table(_output_file_name)
-    generate_newsletter(_input_file_name, fee_table_markdown, _output_file_name)
+    output_file_dir:Path = base_path / config["queues"]["output"]["raw_extract_dir"]
+    output_files:list[Path] = [f for f in output_file_dir.iterdir() if f.is_file() and f.suffix in {".txt"}]
+    for each in output_files:
+        fee_table_markdown = generate_fee_markdown_table(each)
+        generate_newsletter(fee_table_markdown, each)
 
 def run_review_newsletter():
     review_newsletter()

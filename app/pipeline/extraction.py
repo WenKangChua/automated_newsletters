@@ -8,7 +8,7 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def raw_fee_extract(input_file:Path, _output_file_name:str) -> tuple[str]:
+def raw_fee_extract(input_file:Path) -> None:
     """
     From PDF files in a input folder, a model will extract all relevant fees and return
     the results in a text file into a output folder.
@@ -39,6 +39,7 @@ def raw_fee_extract(input_file:Path, _output_file_name:str) -> tuple[str]:
                 logger.info("Repairing prompt...")
                 raw_fee_extract_prompt = repair_prompt_template(context = pdf_context, query = rag_query, previous_output = raw_extract, error = result)
     else:
+        input_file.rename(base_path / config["queues"]["input"]["error"] / f"{input_file.name}.pdf")
         logger.exception("Unexpected failure during extraction")
 
     # Building SLM raw_extract report
@@ -62,9 +63,12 @@ def raw_fee_extract(input_file:Path, _output_file_name:str) -> tuple[str]:
 
     # Write report to review queue
     raw_extract_review_queue_dir:Path = base_path / config["queues"]["review"]["raw_extract_dir"] # Folder where raw extract are to be reviewed
-    raw_extract_review_queue_file = raw_extract_review_queue_dir / f"{_output_file_name}.txt"
+    raw_extract_review_queue_file = raw_extract_review_queue_dir / f"{input_file.name}_output.txt"
     raw_extract_review_queue_file.write_text(model_raw_extract, encoding = "utf-8")
     logger.info(f"Created SLM raw_extract report in: '{Path(*raw_extract_review_queue_file.parts[-3:])}'")
 
-    # return raw_extract, pdf_context
+    # Move pdf file to processed folder
+    processed_file_dir:Path = base_path / config["queues"]["input"]["processed_dir"] / f"{input_file.name}.pdf"
+    input_file.replace(processed_file_dir)
+    
     return None

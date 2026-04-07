@@ -1,0 +1,81 @@
+Bulletin
+```bulletin
+mock_gri_bulletin_1.pdf
+```
+---
+Contains the context used to generate the extract
+```context
+GRI-2025-SG-001 General Rate Increase for Domestic
+Delivery Services in Singapore
+Type:
+Bulletin Announcement
+Published:
+1 March 2025
+Category:
+Pricing / Fees
+Effective:
+1 June 2025
+Audience:
+Shipper / Merchant / Processor
+First Billing:
+9 June 2025
+Region:
+Asia / Pacific
+Brand:
+SwiftFreight
+Country:
+Singapore
+Action:
+Financial
+Executive Overview
+SwiftFreight is revising the delivery surcharge rates for domestic parcel services in Singapore, effective 1 June 2025.
+This General Rate Increase (GRI) applies to standard ground and express air delivery services to reflect rising
+operational and fuel costs.
+Effective Date Details
+Date
+Details
+1 June 2025
+Revised pricing becomes effective
+9 June 2025
+First billing date under new rates
+What SwiftFreight is Doing
+SwiftFreight is revising the surcharge rates for domestic parcel delivery services in Singapore. This revision reflects
+increases in operational costs, including last-mile logistics and handling. The revised rates apply to all domestic
+shipments billed weekly. Refer to the Billing and Pricing Information section below for the updated rate table.
+Version History
+Date
+Description of Change
+1 March 2025
+Initial publication date
+Billing and Pricing Information
+SwiftFreight will revise the fees in the Billing and Pricing table effective 1 June 2025 and will bill the fees weekly with
+the first billing occurring on 9 June 2025.
+Shipper / Merchant Fees
+Weekly Domestic Parcel Delivery
+Billing Event No.
+Billing Event Name
+Service ID
+New Rate (%)
+GRI-SG-001
+Standard Ground Delivery Surcharge
+SG-GND
+2.75
+GRI-SG-002
+Express Air Delivery Surcharge
+SG-AIR
+3.30
+GRI-SG-003
+Residential Address Surcharge
+SG-RES
+1.50
+© 2025 SwiftFreight Logistics Pte. Ltd. Proprietary. All rights reserved.
+GRI-2025-SG-001 General Rate Increase for Domestic Delivery Services in Singapore  1 March 2025
+```
+---
+The extract that was generated based on the context above
+```csv
+"billing_id","service_id","fee_name","new_rate","effective_date","country","currency","change_type","charge_category"
+"GRI-SG-001","SG-GND","Standard Ground Delivery Surcharge","2.75","2025-06-01","Singapore","SGD","updated_fee","destination"
+"GRI-SG-002","SG-AIR","Express Air Delivery Surcharge","3.30","2025-06-01","Singapore","SGD","updated_fee","destination"
+"GRI-SG-003","SG-RES","Residential Address Surcharge","1.50","2025-06-01","Singapore","SGD","updated_fee","destination"
+```
