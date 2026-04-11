@@ -1,3 +1,7 @@
+> **Note:** This project marks my journey into the world of **LLM Powered Workflow**. As a beginner in this space, my goal was to move beyond basic chat prompts and gain hands-on experience building a structured, multi-step pipeline. I used this fictitious logistics use case to practice core engineering patterns: **Few-Shot Prompting**, **Human-in-the-Loop (HITL)**, and **Pydantic** validation.
+> *Note: All data and organizations (e.g., SwiftParcel) are fictitious and created for educational purposes.*
+---
+
 # 📬 Automated Newsletters
 
 An automated pipeline that processes carrier General Rate Increase (GRI) bulletins, enriches rate data with current rates from an internal database, and generates client-ready notification articles — reducing manual effort and ensuring only relevant destination charges reach merchants.
