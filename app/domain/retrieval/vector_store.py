@@ -14,6 +14,8 @@ embeddings = HuggingFaceEmbeddings(
     model_kwargs={'device': 'mps'}
 )
 
+_collection_name = "pdf_temp_store"
+
 def build_vector_store(pdf_file:str, max_page:str = 5) -> Chroma:
     """
     Build a vector store only using PDF as an input.
@@ -32,10 +34,10 @@ def build_vector_store(pdf_file:str, max_page:str = 5) -> Chroma:
             )
         chunks = splitter.split_documents(docs)
         logger.info(f"Chunking documents. {pages} => {max_page}")
-        return Chroma.from_documents(chunks, embedding = embeddings) 
+        return Chroma.from_documents(chunks, embedding = embeddings, collection_name = _collection_name) 
     else:
         logger.info(f"Skip chunking documents. {pages} <= {max_page}")
-        return Chroma.from_documents(docs, embedding = embeddings)
+        return Chroma.from_documents(docs, embedding = embeddings, collection_name = _collection_name)
 
 def query_vector_store(vectorstore:Chroma, rag_query:str, k:int = 3) -> str:
     """
@@ -45,6 +47,22 @@ def query_vector_store(vectorstore:Chroma, rag_query:str, k:int = 3) -> str:
     results.sort(key = lambda d: d.metadata["page"])
     context = "\n".join([r.page_content for r in results])
     return context
+
+def reset_vector_store() -> None:
+    """
+    To clear pdf_temp_store cache data
+    """
+# "Get" the store by referencing the same collection name
+    vector_store = Chroma(
+        collection_name = _collection_name,
+        embedding_function = embeddings
+    )
+    
+    # Delete it
+    logger.info(f"Resetting collection: {_collection_name}")
+    vector_store.delete_collection()
+
+    return None
 
 
 """Document Object Sample:

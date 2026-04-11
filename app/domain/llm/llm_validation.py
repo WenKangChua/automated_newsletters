@@ -14,7 +14,7 @@ class fee_name(BaseModel):
     country:str | None = Field(description = "The country applicable")
     currency:str = Field(description = "The currency of the fees")
     change_type: Literal["new_fee", "updated_fee", "deleted_fee"] = Field(description = "Contains either new_fee, updated_fee or deleted_fee")
-    charge_category: Literal["destination", "origin", "specialised_cargo"] = Field(description = "The category of charges the fee is in")
+    charge_category: Literal["destination", "origin", "specialised"] = Field(description = "The category of charges the fee is in")
     model_config = ConfigDict(extra='forbid')
 
 def validate_output(output:str, pydantic_base_model:BaseModel) -> tuple[bool, str]:
@@ -36,7 +36,7 @@ def validate_output(output:str, pydantic_base_model:BaseModel) -> tuple[bool, st
             pydantic_base_model(**row.to_dict())
         except ValidationError as e:
             for error in e.errors():
-                error_message.append(f"Row {i} | Field: {error['loc']} | Error Message: {error['msg']} | Wrong Value: {error['input']}")
+                error_message.append(f"Row {i+1} | Field: {error['loc']} | Error Message: {error['msg']} | Wrong Value: {error['input']}")
 
     if not error_message:
         return True, output

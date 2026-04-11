@@ -2,6 +2,7 @@ queues:
   input:
     pending_process_dir: "infrastructure/queues/pending_process"
     processed_dir: "infrastructure/queues/pending_process/processed"
+    error: "infrastructure/queues/pending_process/error"
 
   review:
     raw_extract_dir: "infrastructure/queues/pending_review/raw_extract"

@@ -1,5 +1,5 @@
 from pathlib import Path
-from domain.retrieval.vector_store import build_vector_store, query_vector_store
+from domain.retrieval.vector_store import build_vector_store, query_vector_store, reset_vector_store
 from domain.llm.local_llm import run_mini_instruct_model
 from domain.llm.prompt_templates import *
 from domain.llm.llm_validation import validate_output, strip_markdown_fences
@@ -18,7 +18,8 @@ def raw_fee_extract(input_file:Path) -> None:
     # Build store and retrieve file context
     rag_query = "Extract all fees and surcharges information."
     vector_store = build_vector_store(pdf_file = input_file)
-    pdf_context = query_vector_store(vector_store, rag_query = rag_query, k = 3)
+    pdf_context = query_vector_store(vector_store, rag_query = rag_query, k = 5)
+    reset_vector_store()
     
     # Extract raw fee extract from file using SLM
     llm_query = "Generate a csv output according to system prompt."
@@ -39,7 +40,7 @@ def raw_fee_extract(input_file:Path) -> None:
                 logger.info("Repairing prompt...")
                 raw_fee_extract_prompt = repair_prompt_template(context = pdf_context, query = rag_query, previous_output = raw_extract, error = result)
     else:
-        input_file.rename(base_path / config["queues"]["input"]["error"] / f"{input_file.name}.pdf")
+        input_file.rename(base_path / config["queues"]["input"]["error"] / f"{input_file.stem}.pdf")
         logger.exception("Unexpected failure during extraction")
 
     # Building SLM raw_extract report
@@ -63,12 +64,12 @@ def raw_fee_extract(input_file:Path) -> None:
 
     # Write report to review queue
     raw_extract_review_queue_dir:Path = base_path / config["queues"]["review"]["raw_extract_dir"] # Folder where raw extract are to be reviewed
-    raw_extract_review_queue_file = raw_extract_review_queue_dir / f"{input_file.name}_output.txt"
+    raw_extract_review_queue_file = raw_extract_review_queue_dir / f"{input_file.stem}_output.txt"
     raw_extract_review_queue_file.write_text(model_raw_extract, encoding = "utf-8")
     logger.info(f"Created SLM raw_extract report in: '{Path(*raw_extract_review_queue_file.parts[-3:])}'")
 
     # Move pdf file to processed folder
-    processed_file_dir:Path = base_path / config["queues"]["input"]["processed_dir"] / f"{input_file.name}.pdf"
+    processed_file_dir:Path = base_path / config["queues"]["input"]["processed_dir"] / f"{input_file.stem}.pdf"
     input_file.replace(processed_file_dir)
     
     return None

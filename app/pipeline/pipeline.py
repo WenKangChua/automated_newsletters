@@ -20,8 +20,8 @@ def run_generate():
     output_file_dir:Path = base_path / config["queues"]["output"]["raw_extract_dir"]
     output_files:list[Path] = [f for f in output_file_dir.iterdir() if f.is_file() and f.suffix in {".txt"}]
     for each in output_files:
-        fee_table_markdown = generate_fee_markdown_table(each)
-        generate_newsletter(fee_table_markdown, each)
+        fee_table_markdown = generate_fee_markdown_table(each.name)
+        generate_newsletter(fee_table_markdown, each.stem)
 
 def run_review_newsletter():
     review_newsletter()

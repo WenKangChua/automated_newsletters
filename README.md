@@ -244,3 +244,17 @@ automated_newsletters/
 ## 📝 Purpose
 
 This project is for internal/personal use.
+
+## ⚠️ Limitations
+
+**Fee updates only** — The pipeline is designed and tested for rate update scenarios only. New fee introductions and fee removals are recognised during extraction but are not carried through the enrichment and generation stages.
+
+**Document length** — Very long bulletins with fee tables spread across many pages may result in incomplete extractions, as the RAG retrieval may not surface all relevant sections. The SLM (`Phi-4-mini-instruct`) also has a maximum output length, which may cause truncation when a bulletin contains a large number of rate changes.
+
+**Input format** — Only text-based PDF files are supported. Bulletins delivered as HTML emails or Word documents are not compatible. Scanned or image-based PDFs will not extract correctly as the pipeline relies on embedded text.
+
+**Rate database dependency** — Enrichment depends on the internal fee database being current and using consistent billing identifiers. If a carrier changes their rate card structure between bulletins, the enrichment step may return no matches.
+
+**Single bulletin per run** — Only one bulletin can be processed per run. The input file is configured manually in `pipeline.py`.
+
+**Hardware** — Tested on an Apple Silicon MacBook Pro (16GB unified memory) using MPS acceleration. A minimum of 16GB unified memory is recommended. CUDA-capable GPUs are theoretically supported with minor code changes in `local_llm.py` and `vector_store.py`, but this has not been tested. CPU-only inference is not recommended.

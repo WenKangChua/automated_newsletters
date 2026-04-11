@@ -9,12 +9,11 @@ import pandas as pd
 
 logger = get_logger(__name__)
 
-def generate_fee_markdown_table(file_name:str) -> str:
+def generate_fee_markdown_table(file_name:Path) -> str:
     """
     Look up fee database for existing rates and map it against new rates from raw extract.
     Returns a markdown table from a pandas dataframe.
     """
-    file_name = file_name + ".txt"
     raw_extract:Path = base_path / config["queues"]["output"]["raw_extract_dir"] / file_name
     database_file_path:Path = base_path / config["database"]["csv"]["fee_database_csv"]
     
@@ -27,11 +26,10 @@ def generate_fee_markdown_table(file_name:str) -> str:
 
     return updated_fee_table_markdown
 
-def generate_newsletter(fee_table_markdown:str, output_file_name:str) -> None:
+def generate_newsletter(fee_table_markdown:str, file_name:Path) -> None:
 
-    output_file_name = output_file_name + "_results.md"
-    complete_queue_dir = base_path / config["queues"]["review"]["newsletter_dir"] / output_file_name
-    
+    output_file_name = Path(file_name + "_results.md")
+
     prompt = newsletter_prompt_template(updated_fee_table_markdown = fee_table_markdown)
     newsletter = run_mini_instruct_model(prompt = prompt)
     
@@ -52,10 +50,12 @@ def generate_newsletter(fee_table_markdown:str, output_file_name:str) -> None:
     ```
     """
     review_content = ("\n".join(line.strip() for line in review_content.strip().splitlines()))
+    
 
+    complete_queue_dir = base_path / config["queues"]["review"]["newsletter_dir"] / output_file_name
     logger.info(f"Saving System notification to '{complete_queue_dir}'")
     complete_queue_dir.write_text(review_content, encoding = "utf-8")
 
-    logger.info(f"Completed generating system notification: {output_file_name}")
-    # return complete_queue_dir, output_file_name, review_content
+    logger.info(f"Completed generating system notification: {complete_queue_dir}")
+    # return complete_queue_dir, file_name, review_content
     return None
