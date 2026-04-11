@@ -1,4 +1,4 @@
-> **Note:** This project marks my journey into the world of **LLM Powered Workflow**. As a beginner in this space, my goal was to move beyond basic chat prompts and gain hands-on experience building a structured, multi-step pipeline. I used this fictitious logistics use case to practice core engineering patterns: **Few-Shot Prompting**, **Human-in-the-Loop (HITL)**, and **Pydantic** validation.
+> **Note:** This project represents my first experience building a full-scale application and my initial journey into **LLM Orchestration**. As a beginner in this space, I moved beyond standalone scripts to design a complete, multi-step pipeline. This fictitious logistics use case served as a training ground for mastering core engineering patterns: **Few-Shot Prompting**, **Human-in-the-Loop (HITL)**, and **Pydantic** validation.
 > *Note: All data and organizations (e.g., SwiftParcel) are fictitious and created for educational purposes.*
 ---
 
