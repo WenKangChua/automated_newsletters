@@ -148,11 +148,11 @@ python app/entrypoints/main.py
   Automated Newsletters - Pipeline CLI
 ========================================
   1. Run full pipeline
-  2. Stage 1   — Extract fees from PDF
-  3. Stage 1.1 — Review raw extract
-  4. Stage 2+3 — Generate newsletter
-  5. Stage 4   — Review newsletter
-  6. Save approved examples to store
+  2. Extract fees from PDF
+  3. Review raw extract
+  4. Generate newsletter
+  5. Review newsletter
+  6. Save examples to store
   0. Exit
 ========================================
 ```
@@ -174,8 +174,7 @@ automated_newsletters/
 ├── app/
 │   ├── entrypoints/
 │   │   ├── main.py                   # Interactive CLI entry point
-│   │   ├── view_store.py             # Initialise / reset few-shot example store
-│   │   └── markdown_table.py         # Dev utility: preview fee markdown table
+│   │   ├── view_store.py             # Initialise / reset few-shot example store (to be added in pipeline.py)
 │   ├── pipeline/
 │   │   ├── pipeline.py               # Orchestration logic — wires all stages together
 │   │   ├── extraction.py             # Stage 1: PDF extraction & validation
