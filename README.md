@@ -41,20 +41,7 @@ This pipeline automates the full workflow: extract → enrich → generate → r
 
 ```mermaid
 flowchart TD
-    A[Receive carrier GRI bulletin PDF] --> B[Manually read bulletin]
-    B --> C{Destination charge\nrelevant to merchants?}
-    C -- No --> D[Discard / Ignore]
-    C -- Yes --> E[Manually look up current rate\nin internal systems]
-    E --> F[Draft newsletter article]
-    F --> G[Internal review & edits]
-    G --> H[Send to merchants]
-```
-
-### To-Be (Automated Pipeline)
-
-```mermaid
-flowchart TD
-    A[Receive carrier GRI bulletin PDF] --> B
+    A[Drop PDF bulletins into pending_process folder] --> B
 
     subgraph Stage 1 - Extract
         B[RAG: Chunk & embed PDF] --> C[Similarity search for rate context]
@@ -62,28 +49,28 @@ flowchart TD
         D --> E{Pydantic validation}
         E -- Invalid --> F[Repair prompt loop\nmax 3 retries]
         F --> D
-        E -- Valid --> G[Save raw extract\nto pending review queue]
+        E -- Max retries exceeded --> G[Move PDF to error folder]
+        E -- Valid --> H[Save raw extract to pending review queue\nMove PDF to processed folder]
     end
 
     subgraph Stage 1.1 - Human Review
-        G --> H[Operator reviews raw extract]
-        H -- Approved --> I[Move to rate extract queue]
-        H -- Rejected --> J[Discard]
+        H --> I[Operator opens & reviews raw extract]
+        I -- Approved --> J[Move to completed raw extract queue]
+        I -- Rejected --> K[Discard]
     end
 
-    subgraph Stage 2 - Enrich
-        I --> K[Match billing ID & service ID\nagainst rate database]
-        K --> L[Filter to destination charges only\nMerge current rates]
-    end
-
-    subgraph Stage 3 - Generate
-        L --> M[LLM generates article-style\nmerchant notification]
+    subgraph Stage 2 + 3 - Enrich & Generate
+        J --> L[Match billing ID & service ID\nagainst rate database]
+        L --> M[Filter to destination charges only\nMerge current rates]
+        M --> N[LLM generates article-style\nmerchant notification]
+        N --> O[Save newsletter to pending review queue]
     end
 
     subgraph Stage 4 - Review & Store
-        M --> N[Operator reviews & edits notification]
-        N -- Approved --> O[Save to example store\nfor future few-shot use]
-        N -- Approved --> P[Publish notification to merchants]
+        O --> P[Operator opens & reviews newsletter]
+        P -- Approved --> Q[Move to completed newsletter queue]
+        P -- Rejected --> R[Discard]
+        Q --> S[Copy raw extract & newsletter\nto ChromaDB example store]
     end
 ```
 
